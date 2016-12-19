@@ -1,5 +1,6 @@
 package com.example.karan.sunshine;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -10,16 +11,37 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class FetchWeatherTask extends AsyncTask<Void, Void, Void> {
+class FetchWeatherTask extends AsyncTask<String, Void, Void> {
     @Override
-    protected Void doInBackground(Void... voids) {
+    protected Void doInBackground(String... params) {
+        if (params.length == 0) {
+            return null;
+        }
         final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
         HttpURLConnection urlConn = null;
         BufferedReader bReader = null;
         String forecastJSON = null;
-
+        Uri.Builder builder = new Uri.Builder();
+        final String QUERY_PARAM = "q";
+        final String MODE_PARAM = "mode";
+        final String UNITS_PARAM = "units";
+        final String DAYCOUNT_PARAM = "cnt";
+        final String APIKEY_PARAM = "appid";
+        builder.scheme("http")
+                .authority("api.openweathermap.org")
+                .appendPath("data")
+                .appendPath("2.5")
+                .appendPath("forecast")
+                .appendPath("daily")
+                .appendQueryParameter(QUERY_PARAM, params[0])
+                .appendQueryParameter(MODE_PARAM, "json")
+                .appendQueryParameter(UNITS_PARAM, "metric")
+                .appendQueryParameter(DAYCOUNT_PARAM, "7")
+                .appendQueryParameter(APIKEY_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
+                .build();
+        Log.v(LOG_TAG, "URL Built is: " + builder);
         try {
-            URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7&appid=d8b5e866ae6e896fc5b7d37eb80fc72e");
+            URL url = new URL(builder.toString());
             urlConn = (HttpURLConnection) url.openConnection();
             urlConn.setRequestMethod("GET");
             urlConn.connect();
