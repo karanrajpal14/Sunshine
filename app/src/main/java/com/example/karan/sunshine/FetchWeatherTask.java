@@ -17,9 +17,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
-class FetchWeatherTask extends AsyncTask<String, Void, Void> {
+class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
-    private static final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+    private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+    private String[] forecastArr;
 
     /* The date/time conversion code is going to be moved outside the asynctask later,
              * so for convenience we're breaking it out into its own method now.
@@ -39,8 +40,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, Void> {
         long roundedHigh = Math.round(high);
         long roundedLow = Math.round(low);
 
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
+        return (roundedHigh + "/" + roundedLow);
     }
 
     /**
@@ -120,7 +120,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected String[] doInBackground(String... params) {
         if (params.length == 0) {
             return null;
         }
@@ -170,10 +170,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             }
 
             forecastJSON = buffer.toString();
-            String[] stringarr = getWeatherDataFromJson(forecastJSON, 7);
-            for (String s : stringarr) {
-                System.out.println(s);
-            }
+            forecastArr = getWeatherDataFromJson(forecastJSON, 7);
 
         } catch (java.io.IOException e) {
             Log.e(LOG_TAG, "Error fetching data", e);
@@ -192,6 +189,16 @@ class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 }
             }
         }
-        return null;
+        return forecastArr;
+    }
+
+    @Override
+    protected void onPostExecute(String[] strings) {
+        super.onPostExecute(strings);
+        if (strings != null) {
+            for (String dayForecastStr : strings) {
+                Log.v(LOG_TAG, dayForecastStr);
+            }
+        }
     }
 }
