@@ -14,9 +14,10 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements FetchWeatherResponse {
 
     public ArrayAdapter forecastAdapter;
+    //public FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(this);
 
     public MainActivityFragment() {
     }
@@ -40,5 +41,11 @@ public class MainActivityFragment extends Fragment {
         listView.setAdapter(forecastAdapter);
 
         return view;
+    }
+
+    @Override
+    public void onFetchFinish(String[] weekForecast) {
+        forecastAdapter.clear();
+        forecastAdapter.addAll(weekForecast);
     }
 }

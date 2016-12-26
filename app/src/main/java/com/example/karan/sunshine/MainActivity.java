@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.action_refresh) {
             Toast.makeText(getApplicationContext(), "Refreshing", Toast.LENGTH_SHORT).show();
-            new FetchWeatherTask().execute("94043");
+            new FetchWeatherTask(this).execute("94043");
             Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_SHORT).show();
         }
 

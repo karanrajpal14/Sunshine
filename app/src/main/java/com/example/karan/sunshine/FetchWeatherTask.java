@@ -20,7 +20,12 @@ import java.text.SimpleDateFormat;
 class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+    FetchWeatherResponse fetchWeatherResponse;
     private String[] forecastArr;
+
+    public FetchWeatherTask(MainActivity activity) {
+        fetchWeatherResponse = (FetchWeatherResponse) activity;
+    }
 
     /* The date/time conversion code is going to be moved outside the asynctask later,
              * so for convenience we're breaking it out into its own method now.
@@ -195,10 +200,6 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
     @Override
     protected void onPostExecute(String[] strings) {
         super.onPostExecute(strings);
-        if (strings != null) {
-            for (String dayForecastStr : strings) {
-                Log.v(LOG_TAG, dayForecastStr);
-            }
-        }
+        fetchWeatherResponse.onFetchFinish(strings);
     }
 }
