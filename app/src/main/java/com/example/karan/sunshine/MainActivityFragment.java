@@ -1,7 +1,7 @@
 package com.example.karan.sunshine;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +14,10 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements FetchWeatherResponse {
+public class MainActivityFragment extends android.app.Fragment implements onMenuItemSelected, FetchWeatherResponse {
 
     public ArrayAdapter forecastAdapter;
-    //public FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(this);
+    //private FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(this);
 
     public MainActivityFragment() {
     }
@@ -44,8 +44,14 @@ public class MainActivityFragment extends Fragment implements FetchWeatherRespon
     }
 
     @Override
+    public void onRefreshSelected(String countryCode) {
+        new FetchWeatherTask(this).execute(countryCode);
+    }
+
+    @Override
     public void onFetchFinish(String[] weekForecast) {
-        forecastAdapter.clear();
-        forecastAdapter.addAll(weekForecast);
+        //forecastAdapter.clear();
+        Log.v("Finished Fetching", weekForecast[0]);
+        //forecastAdapter.addAll(weekForecast);
     }
 }

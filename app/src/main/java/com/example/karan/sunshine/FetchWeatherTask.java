@@ -20,11 +20,11 @@ import java.text.SimpleDateFormat;
 class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-    FetchWeatherResponse fetchWeatherResponse;
     private String[] forecastArr;
+    private FetchWeatherResponse fetchWeatherResponse = null;
 
-    public FetchWeatherTask(MainActivity activity) {
-        fetchWeatherResponse = (FetchWeatherResponse) activity;
+    public FetchWeatherTask(MainActivityFragment mainActivityFragment) {
+        fetchWeatherResponse = mainActivityFragment;
     }
 
     /* The date/time conversion code is going to be moved outside the asynctask later,
@@ -199,7 +199,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected void onPostExecute(String[] strings) {
-        super.onPostExecute(strings);
+        //super.onPostExecute(strings);
         fetchWeatherResponse.onFetchFinish(strings);
     }
 }
