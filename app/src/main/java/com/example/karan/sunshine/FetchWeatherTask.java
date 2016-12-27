@@ -21,10 +21,8 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
     private String[] forecastArr;
-    private FetchWeatherResponse fetchWeatherResponse = null;
 
-    public FetchWeatherTask(MainActivityFragment mainActivityFragment) {
-        fetchWeatherResponse = mainActivityFragment;
+    public FetchWeatherTask() {
     }
 
     /* The date/time conversion code is going to be moved outside the asynctask later,
@@ -199,7 +197,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected void onPostExecute(String[] strings) {
-        //super.onPostExecute(strings);
-        fetchWeatherResponse.onFetchFinish(strings);
+        MainActivityFragment.forecastAdapter.clear();
+        MainActivityFragment.forecastAdapter.addAll(strings);
     }
 }

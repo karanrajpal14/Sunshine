@@ -1,7 +1,6 @@
 package com.example.karan.sunshine;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +13,9 @@ import java.util.Arrays;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends android.app.Fragment implements onMenuItemSelected, FetchWeatherResponse {
+public class MainActivityFragment extends android.app.Fragment implements onMenuItemSelected {
 
-    public ArrayAdapter forecastAdapter;
-    //private FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(this);
+    public static ArrayAdapter forecastAdapter;
 
     public MainActivityFragment() {
     }
@@ -25,7 +23,9 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+
         String[] data = {
                 "Mon 6/23 - Sunny - 31/17",
                 "Tue 6/24 - Foggy - 21/8",
@@ -35,6 +35,7 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
                 "Sat 6/28 - TRAPPED IN WEATHER STATION - 23/18",
                 "Sun 6/29 - Sunny - 20/7"
         };
+
         ArrayList<String> weekForecast = new ArrayList<>(Arrays.asList(data));
         forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.textView_listItem, weekForecast);
         ListView listView = (ListView) view.findViewById(R.id.listView_forecast);
@@ -45,13 +46,6 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
 
     @Override
     public void onRefreshSelected(String countryCode) {
-        new FetchWeatherTask(this).execute(countryCode);
-    }
-
-    @Override
-    public void onFetchFinish(String[] weekForecast) {
-        //forecastAdapter.clear();
-        Log.v("Finished Fetching", weekForecast[0]);
-        //forecastAdapter.addAll(weekForecast);
+        new FetchWeatherTask().execute(countryCode);
     }
 }

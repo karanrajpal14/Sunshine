@@ -9,6 +9,6 @@
         android:id="@+id/textView_listItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="20dp"
+        android:minHeight="?android:attr/listPreferredItemHeight"
         android:text="TextView" />
 </LinearLayout>
