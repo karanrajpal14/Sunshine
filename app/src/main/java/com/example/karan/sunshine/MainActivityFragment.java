@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +42,12 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
         forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.textView_listItem, weekForecast);
         ListView listView = (ListView) view.findViewById(R.id.listView_forecast);
         listView.setAdapter(forecastAdapter);
-
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getActivity(), forecastAdapter.getItem(i).toString(), Toast.LENGTH_LONG).show();
+            }
+        });
         return view;
     }
 
