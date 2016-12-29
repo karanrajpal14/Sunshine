@@ -1,5 +1,6 @@
 package com.example.karan.sunshine;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +45,10 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getActivity(), forecastAdapter.getItem(i).toString(), Toast.LENGTH_LONG).show();
+                Intent weatherDetailIntent = new Intent(getActivity(), DetailActivity.class);
+                weatherDetailIntent.putExtra("clickedDayForecast", forecastAdapter.getItem(i).toString());
+                //Toast.makeText(getActivity(), Intent.EXTRA_TEXT, Toast.LENGTH_LONG).show();
+                startActivity(weatherDetailIntent);
             }
         });
         return view;
