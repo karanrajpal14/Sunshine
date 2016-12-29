@@ -52,9 +52,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.action_refresh) {
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+            FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             String location = pref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
-            new MainActivityFragment().onRefreshSelected(location);
+            String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default_value));
+            fetchWeatherTask.execute(location, units);
         }
         return super.onOptionsItemSelected(item);
     }

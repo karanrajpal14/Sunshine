@@ -21,7 +21,6 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
     private String[] forecastArr;
-
     public FetchWeatherTask() {
     }
 
@@ -38,11 +37,17 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
     /**
      * Prepare the weather high/lows for presentation.
      */
-    private String formatHighLows(double high, double low) {
+    private String formatHighLows(double high, double low, String unit) {
         // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
+        long roundedHigh;
+        long roundedLow;
+        if (unit.equalsIgnoreCase("metric")) {
+            roundedHigh = Math.round(high);
+            roundedLow = Math.round(low);
+        } else {
+            roundedHigh = Math.round((high * 1.8) + 32);
+            roundedLow = Math.round((low * 1.8) + 32);
+        }
         return (roundedHigh + "/" + roundedLow);
     }
 
@@ -53,7 +58,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays, String unit)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -112,7 +117,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
-            highAndLow = formatHighLows(high, low);
+            highAndLow = formatHighLows(high, low, unit);
             resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
 
@@ -124,12 +129,15 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     @Override
     protected String[] doInBackground(String... params) {
+        for (String s : params) {
+            Log.v(LOG_TAG, s);
+        }
         if (params.length == 0) {
             return null;
         }
         HttpURLConnection urlConn = null;
         BufferedReader bReader = null;
-        String forecastJSON = null;
+        String forecastJSON;
         Uri.Builder builder = new Uri.Builder();
         final String QUERY_PARAM = "q";
         final String MODE_PARAM = "mode";
@@ -173,7 +181,7 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             }
 
             forecastJSON = buffer.toString();
-            forecastArr = getWeatherDataFromJson(forecastJSON, 7);
+            forecastArr = getWeatherDataFromJson(forecastJSON, 7, params[1]);
 
         } catch (java.io.IOException e) {
             Log.e(LOG_TAG, "Error fetching data", e);

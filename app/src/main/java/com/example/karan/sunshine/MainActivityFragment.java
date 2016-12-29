@@ -29,7 +29,8 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
         FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String location = pref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
-        fetchWeatherTask.execute(location);
+        String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default_value));
+        fetchWeatherTask.execute(location, units);
     }
 
     @Override
@@ -54,6 +55,10 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
 
     @Override
     public void onRefreshSelected(String countryCode) {
-        new FetchWeatherTask().execute(countryCode);
+        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = pref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
+        String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default_value));
+        fetchWeatherTask.execute(location, units);
     }
 }

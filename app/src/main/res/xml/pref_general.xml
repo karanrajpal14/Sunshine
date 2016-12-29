@@ -4,7 +4,15 @@
         android:defaultValue="94043"
         android:enabled="true"
         android:key="location"
-        android:summary="@string/pref_location_summary"
         android:title="@string/pref_location_title" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_units_default_value"
+        android:enabled="true"
+        android:entries="@array/units_entries"
+        android:entryValues="@array/units_values"
+        android:key="@string/pref_units_key"
+        android:summary="@string/pref_units_summary"
+        android:title="@string/pref_units_title" />
 
 </PreferenceScreen>
