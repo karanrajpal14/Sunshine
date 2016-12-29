@@ -2,4 +2,15 @@
     <string name="app_name">Sunshine</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_detail">DetailActivity</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_location_title">Location</string>
+    <string name="pref_location_summary">Add postal code here to change the location.</string>
+    <string name="pref_location_key">location</string>
+    <string name="pref_location_default_value">94043</string>
+
 </resources>
