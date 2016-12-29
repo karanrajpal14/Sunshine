@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends android.app.Fragment implements onMenuItemSelected {
+public class MainActivityFragment extends android.app.Fragment {
 
     public static ArrayAdapter forecastAdapter;
 
@@ -46,19 +46,9 @@ public class MainActivityFragment extends android.app.Fragment implements onMenu
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent weatherDetailIntent = new Intent(getActivity(), DetailActivity.class);
                 weatherDetailIntent.putExtra("clickedDayForecast", forecastAdapter.getItem(i).toString());
-                //Toast.makeText(getActivity(), Intent.EXTRA_TEXT, Toast.LENGTH_LONG).show();
                 startActivity(weatherDetailIntent);
             }
         });
         return view;
-    }
-
-    @Override
-    public void onRefreshSelected(String countryCode) {
-        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String location = pref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
-        String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default_value));
-        fetchWeatherTask.execute(location, units);
     }
 }

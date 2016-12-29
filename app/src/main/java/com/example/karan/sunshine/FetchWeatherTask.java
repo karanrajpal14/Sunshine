@@ -120,18 +120,11 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             highAndLow = formatHighLows(high, low, unit);
             resultStrs[i] = day + " - " + description + " - " + highAndLow;
         }
-
-        for (String s : resultStrs) {
-            Log.v(LOG_TAG, "Forecast entry: " + s);
-        }
         return resultStrs;
     }
 
     @Override
     protected String[] doInBackground(String... params) {
-        for (String s : params) {
-            Log.v(LOG_TAG, s);
-        }
         if (params.length == 0) {
             return null;
         }
@@ -156,7 +149,6 @@ class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
                 .appendQueryParameter(DAYCOUNT_PARAM, "7")
                 .appendQueryParameter(APIKEY_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
                 .build();
-        Log.v(LOG_TAG, "URL Built is: " + builder);
         try {
             URL url = new URL(builder.toString());
             urlConn = (HttpURLConnection) url.openConnection();
