@@ -15,4 +15,9 @@
         android:summary="@string/pref_units_summary"
         android:title="@string/pref_units_title" />
 
+    <Preference
+        android:key="viewOnMap"
+        android:summary="Tap this to view your selected location on a map"
+        android:title="View Location on Map" />
+
 </PreferenceScreen>

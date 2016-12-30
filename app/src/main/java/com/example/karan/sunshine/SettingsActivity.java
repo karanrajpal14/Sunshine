@@ -1,10 +1,15 @@
 package com.example.karan.sunshine;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -23,10 +28,31 @@ public class SettingsActivity extends PreferenceActivity
         // Add 'general' preferences, defined in the XML file
         addPreferencesFromResource(R.xml.pref_general);
 
+        Preference viewOnMapButton = findPreference("viewOnMap");
+        viewOnMapButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Toast.makeText(getBaseContext(), "Button works", Toast.LENGTH_LONG).show();
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                String location = preferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
+                Uri geolocation = Uri.parse("geo:0,0").buildUpon().appendQueryParameter("q", location).build();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(geolocation);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                } else {
+                    Log.d("Couldn't start activity", " no application handler found");
+                }
+                return true;
+            }
+        });
+
+
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
+        bindPreferenceSummaryToValue(findPreference("viewOnMap"));
     }
 
     /**
