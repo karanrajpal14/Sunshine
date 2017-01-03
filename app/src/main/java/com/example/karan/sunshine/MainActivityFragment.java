@@ -45,7 +45,7 @@ public class MainActivityFragment extends android.app.Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent weatherDetailIntent = new Intent(getActivity(), DetailActivity.class);
-                weatherDetailIntent.putExtra("clickedDayForecast", forecastAdapter.getItem(i).toString());
+                weatherDetailIntent.putExtra(Intent.EXTRA_TEXT, forecastAdapter.getItem(i).toString());
                 startActivity(weatherDetailIntent);
             }
         });
