@@ -13,10 +13,15 @@
     <string name="pref_location_key">location</string>
     <string name="pref_location_default_value">94043</string>
 
-    <string name="pref_units_default_value">metric</string>
     <string name="pref_units_title">Units</string>
     <string name="pref_units_key">units</string>
     <string name="pref_units_summary">Change the preferred units here.</string>
+
+    <string name="pref_units_metric_title">Metric</string>
+    <string name="pref_units_metric_key">metric</string>
+
+    <string name="pref_units_imperial_title">Imperial</string>
+    <string name="pref_units_imperial_key">imperial</string>
 
     <string name="action_share">Share</string>
 

@@ -2,13 +2,13 @@
 <resources>
 
     <string-array name="units_entries">
-        <item>Metric</item>
-        <item>Imperial</item>
+        <item>@string/pref_units_metric_title</item>
+        <item>@string/pref_units_imperial_title</item>
     </string-array>
 
     <string-array name="units_values">
-        <item>metric</item>
-        <item>imperial</item>
+        <item>@string/pref_units_metric_key</item>
+        <item>@string/pref_units_imperial_key</item>
     </string-array>
 
 </resources>

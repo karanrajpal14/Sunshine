@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.action_refresh) {
-            FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
+            FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getApplicationContext());
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             String location = pref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
-            String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_default_value));
+            String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_metric_key));
             fetchWeatherTask.execute(location, units);
         }
         return super.onOptionsItemSelected(item);
