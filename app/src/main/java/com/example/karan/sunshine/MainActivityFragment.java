@@ -68,7 +68,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-
         forecastAdapter = new ForecastAdapter(getActivity(), null, 0);
         ListView listView = (ListView) view.findViewById(R.id.listView_forecast);
         listView.setAdapter(forecastAdapter);

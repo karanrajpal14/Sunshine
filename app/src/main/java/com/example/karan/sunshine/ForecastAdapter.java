@@ -6,16 +6,31 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
-public class ForecastAdapter extends CursorAdapter {
+class ForecastAdapter extends CursorAdapter {
 
-    public ForecastAdapter(Context context, Cursor c, int flags) {
+    public final String TAG = this.getClass().getSimpleName();
+    private final int VIEW_TYPE_TODAY = 0;
+    private final int VIEW_TYPE_FUTURE_DAY = 1;
+
+    ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position == 0) ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
     }
 
     /**
@@ -23,7 +38,7 @@ public class ForecastAdapter extends CursorAdapter {
      */
     private String formatHighLows(double high, double low) {
         boolean isMetric = Utility.isMetric(mContext);
-        return Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
+        return Utility.formatTemperature(mContext, high, isMetric) + "/" + Utility.formatTemperature(mContext, low, isMetric);
     }
 
     /*
@@ -46,7 +61,13 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.list_item_forecast, parent, false);
+        int viewType = getItemViewType(cursor.getPosition());
+        int layoutID = -1;
+        if (viewType == VIEW_TYPE_TODAY)
+            layoutID = R.layout.list_item_forecast_today;
+        else if (viewType == VIEW_TYPE_FUTURE_DAY)
+            layoutID = R.layout.list_item_forecast;
+        return LayoutInflater.from(context).inflate(layoutID, parent, false);
     }
 
     /*
@@ -57,7 +78,39 @@ public class ForecastAdapter extends CursorAdapter {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
 
-        TextView tv = (TextView) view.findViewById(R.id.textView_listItem);
-        tv.setText(convertCursorRowToUXFormat(cursor));
+        /*TextView tv = (TextView) view.findViewById(R.id.textView_listItem);
+        tv.setText(convertCursorRowToUXFormat(cursor));*/
+
+        ViewHolder viewHolder = new ViewHolder(view);
+
+        viewHolder.iconView.setImageResource(R.mipmap.ic_launcher);
+
+        String date = Utility.getFriendlyDayString(mContext, cursor.getLong(MainActivityFragment.COL_WEATHER_DATE));
+        viewHolder.dateTextView.setText(date);
+
+        String description = cursor.getString(MainActivityFragment.COL_WEATHER_DESC);
+        viewHolder.descTextView.setText(description);
+
+        String high = Utility.formatTemperature(mContext, cursor.getDouble(MainActivityFragment.COL_WEATHER_MAX_TEMP), Utility.isMetric(mContext));
+        viewHolder.highTextView.setText(high);
+
+        String low = Utility.formatTemperature(mContext, cursor.getDouble(MainActivityFragment.COL_WEATHER_MIN_TEMP), Utility.isMetric(mContext));
+        viewHolder.lowTextView.setText(low);
+    }
+
+    private static class ViewHolder {
+        final ImageView iconView;
+        final TextView dateTextView;
+        final TextView descTextView;
+        final TextView highTextView;
+        final TextView lowTextView;
+
+        ViewHolder(View view) {
+            iconView = (ImageView) view.findViewById(R.id.list_item_icon);
+            dateTextView = (TextView) view.findViewById(R.id.list_item_date_textView);
+            descTextView = (TextView) view.findViewById(R.id.list_item_forecast_textView);
+            highTextView = (TextView) view.findViewById(R.id.list_item_high_textView);
+            lowTextView = (TextView) view.findViewById(R.id.list_item_low_textView);
+        }
     }
 }
