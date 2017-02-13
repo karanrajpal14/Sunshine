@@ -105,7 +105,7 @@ class Utility {
      * @param dateInMillis The date in milliseconds
      * @return a localized version of the day is returned as a String
      */
-    private static String getDayName(Context context, long dateInMillis) {
+    public static String getDayName(Context context, long dateInMillis) {
         // If the date is today, return the localized version of "Today" instead of the actual
         // day name.
 
@@ -134,11 +134,102 @@ class Utility {
      *                     in Utility.DATE_FORMAT
      * @return The day in the form of a string formatted "December 6"
      */
-    private static String getFormattedMonthDay(Context context, long dateInMillis) {
+    public static String getFormattedMonthDay(Context context, long dateInMillis) {
         Time time = new Time();
         time.setToNow();
         SimpleDateFormat dbDateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
         SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
         return monthDayFormat.format(dateInMillis);
+    }
+
+    public static String getFormattedWind(Context context, float windSpeed, float degrees) {
+        int windFormat;
+
+        final String[] directionsText = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+        final int DEGREES_TOTAL = 360;
+        final int DIR_TOTAL = 8;
+
+        String direction = directionsText[Math.round(degrees / (DEGREES_TOTAL / DIR_TOTAL)) % DIR_TOTAL];
+
+        if (Utility.isMetric(context)) {
+            windFormat = R.string.format_wind_kmh;
+        } else {
+            windFormat = R.string.format_wind_mph;
+            windSpeed = .621371192237334f * windSpeed;
+        }
+
+        return String.format(context.getString(windFormat), windSpeed, direction);
+    }
+
+    /**
+     * Helper method to provide the icon resource id according to the weather condition id returned
+     * by the OpenWeatherMap call.
+     *
+     * @param weatherId from OpenWeatherMap API response
+     * @return resource id for the corresponding icon. -1 if no relation is found.
+     */
+    public static int getIconResourceForWeatherCondition(int weatherId) {
+        // Based on weather code data found at:
+        // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
+        if (weatherId >= 200 && weatherId <= 232) {
+            return R.drawable.ic_storm;
+        } else if (weatherId >= 300 && weatherId <= 321) {
+            return R.drawable.ic_light_rain;
+        } else if (weatherId >= 500 && weatherId <= 504) {
+            return R.drawable.ic_rain;
+        } else if (weatherId == 511) {
+            return R.drawable.ic_snow;
+        } else if (weatherId >= 520 && weatherId <= 531) {
+            return R.drawable.ic_rain;
+        } else if (weatherId >= 600 && weatherId <= 622) {
+            return R.drawable.ic_snow;
+        } else if (weatherId >= 701 && weatherId <= 761) {
+            return R.drawable.ic_fog;
+        } else if (weatherId == 761 || weatherId == 781) {
+            return R.drawable.ic_storm;
+        } else if (weatherId == 800) {
+            return R.drawable.ic_clear;
+        } else if (weatherId == 801) {
+            return R.drawable.ic_light_clouds;
+        } else if (weatherId >= 802 && weatherId <= 804) {
+            return R.drawable.ic_cloudy;
+        }
+        return -1;
+    }
+
+    /**
+     * Helper method to provide the art resource id according to the weather condition id returned
+     * by the OpenWeatherMap call.
+     *
+     * @param weatherId from OpenWeatherMap API response
+     * @return resource id for the corresponding image. -1 if no relation is found.
+     */
+    public static int getArtResourceForWeatherCondition(int weatherId) {
+        // Based on weather code data found at:
+        // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
+        if (weatherId >= 200 && weatherId <= 232) {
+            return R.drawable.art_storm;
+        } else if (weatherId >= 300 && weatherId <= 321) {
+            return R.drawable.art_light_rain;
+        } else if (weatherId >= 500 && weatherId <= 504) {
+            return R.drawable.art_rain;
+        } else if (weatherId == 511) {
+            return R.drawable.art_snow;
+        } else if (weatherId >= 520 && weatherId <= 531) {
+            return R.drawable.art_rain;
+        } else if (weatherId >= 600 && weatherId <= 622) {
+            return R.drawable.art_snow;
+        } else if (weatherId >= 701 && weatherId <= 761) {
+            return R.drawable.art_fog;
+        } else if (weatherId == 761 || weatherId == 781) {
+            return R.drawable.art_storm;
+        } else if (weatherId == 800) {
+            return R.drawable.art_clear;
+        } else if (weatherId == 801) {
+            return R.drawable.art_light_clouds;
+        } else if (weatherId >= 802 && weatherId <= 804) {
+            return R.drawable.art_clouds;
+        }
+        return -1;
     }
 }
