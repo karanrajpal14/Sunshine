@@ -51,7 +51,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     };
     final String MAINFRAGMENT_TAG = "MF_TAG";
     public ForecastAdapter forecastAdapter;
-    String currentKnownLocation;
     private Cursor weatherCursor;
 
     public MainActivityFragment() {
@@ -87,22 +86,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        String location = Utility.getPreferredLocation(getActivity());
-        if (currentKnownLocation != null && !location.equals(currentKnownLocation)) {
-            MainActivityFragment mainActivityFragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.fragment_main);
-            if (mainActivityFragment != null) {
-                mainActivityFragment.onLocationChanged();
-            } else {
-                currentKnownLocation = location;
-            }
-        }
-    }
-
-    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader cursorLoader;
         String locationSetting = Utility.getPreferredLocation(getActivity());
         final String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC"; //Sort Order : Ascending, by date
         Uri weatherForLocationUri = WeatherContract.WeatherEntry

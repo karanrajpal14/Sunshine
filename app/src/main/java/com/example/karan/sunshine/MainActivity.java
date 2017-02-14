@@ -13,12 +13,12 @@ public class MainActivity extends AppCompatActivity {
 
     private final String DETAILFRAGMENT_TAG = "DFTAG";
     private boolean twoPane;
-    private String location;
+    private String currentKnownLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        location = Utility.getPreferredLocation(this);
+        currentKnownLocation = Utility.getPreferredLocation(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (findViewById(R.id.weather_detail_container) != null) {
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        getMenuInflater().inflate(R.menu.menu_forecastfragment, menu);
+        //getMenuInflater().inflate(R.menu.menu_forecastfragment, menu);
         return true;
     }
 
@@ -61,5 +61,19 @@ public class MainActivity extends AppCompatActivity {
             fetchWeatherTask.execute(location, units);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String location = Utility.getPreferredLocation(getApplicationContext());
+        if (location != null && !location.equals(currentKnownLocation)) {
+            MainActivityFragment mainActivityFragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+            if (mainActivityFragment != null) {
+                mainActivityFragment.onLocationChanged();
+            } else {
+                currentKnownLocation = location;
+            }
+        }
     }
 }

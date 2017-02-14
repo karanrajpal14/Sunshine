@@ -13,7 +13,7 @@
     -->
 
     <fragment
-        android:id="@+id/content_main"
+        android:id="@+id/fragment_main"
         android:name="com.example.karan.sunshine.MainActivityFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
