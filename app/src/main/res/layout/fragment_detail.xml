@@ -24,7 +24,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Today" />
 
 
         <TextView
@@ -32,7 +33,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            tools:text="June, 24th" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -54,7 +56,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textAlignment="center"
-                    android:textSize="40sp" />
+                    android:textSize="40sp"
+                    tools:text="52" />
 
                 <TextView
                     android:id="@+id/detail_low_textView"
@@ -62,7 +65,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textAlignment="center"
-                    android:textSize="40sp" />
+                    android:textSize="40sp"
+                    tools:text="11" />
 
             </LinearLayout>
 
@@ -77,13 +81,15 @@
                 <ImageView
                     android:id="@+id/detail_icon_imageView"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    tools:src="@drawable/art_storm" />
 
                 <TextView
                     android:id="@+id/detail_forecast_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="25sp" />
+                    android:textSize="25sp"
+                    tools:text="Storm" />
 
             </LinearLayout>
 
@@ -93,19 +99,22 @@
             android:id="@+id/detail_humidity_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            tools:text="Humidity: 48%" />
 
         <TextView
             android:id="@+id/detail_wind_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            tools:text="Wind Speed: 6 KM/H NW" />
 
         <TextView
             android:id="@+id/detail_pressure_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            tools:text="Pressure: 1014 kPa" />
 
     </LinearLayout>
 

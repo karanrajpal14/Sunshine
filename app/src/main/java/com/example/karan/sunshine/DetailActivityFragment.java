@@ -126,7 +126,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Intent detailsIntent = getActivity().getIntent();
-        if (detailsIntent == null) {
+        if (detailsIntent == null || detailsIntent.getData() == null) {
             return null;
         }
         return new CursorLoader(

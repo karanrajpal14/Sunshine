@@ -11,11 +11,25 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String DETAILFRAGMENT_TAG = "DFTAG";
+    private boolean twoPane;
+    private String location;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        location = Utility.getPreferredLocation(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (findViewById(R.id.weather_detail_container) != null) {
+            twoPane = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.weather_detail_container, new DetailActivityFragment(), DETAILFRAGMENT_TAG)
+                        .commit();
+            } else
+                twoPane = false;
+        }
         setSupportActionBar(toolbar);
     }
 

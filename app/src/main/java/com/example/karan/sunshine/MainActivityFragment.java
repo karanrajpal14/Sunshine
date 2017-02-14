@@ -91,7 +91,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         super.onResume();
         String location = Utility.getPreferredLocation(getActivity());
         if (currentKnownLocation != null && !location.equals(currentKnownLocation)) {
-            MainActivityFragment mainActivityFragment = (MainActivityFragment) getFragmentManager().findFragmentByTag(MAINFRAGMENT_TAG);
+            MainActivityFragment mainActivityFragment = (MainActivityFragment) getFragmentManager().findFragmentById(R.id.fragment_main);
             if (mainActivityFragment != null) {
                 mainActivityFragment.onLocationChanged();
             } else {
