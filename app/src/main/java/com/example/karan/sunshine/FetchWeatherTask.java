@@ -229,7 +229,6 @@ class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             return null;
         }
         String locationQuery = params[0];
-        String inputUnit = params[1];
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.

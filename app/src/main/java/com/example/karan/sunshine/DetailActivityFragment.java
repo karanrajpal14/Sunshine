@@ -38,7 +38,6 @@ public class DetailActivityFragment extends Fragment implements android.support.
     static final int COL_WEATHER_WIND_SPEED = 7;
     static final int COL_WEATHER_DEGREES = 8;
     static final int COL_WEATHER_CONDITION_ID = 9;
-
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
     private static final int DETAIL_LOADER_ID = 1;
     private static final String[] DETAIL_COLUMNS = {
@@ -71,15 +70,28 @@ public class DetailActivityFragment extends Fragment implements android.support.
     private TextView windTextView;
     private TextView pressureTextView;
 
-
     public DetailActivityFragment() {
+        setHasOptionsMenu(true);
+    }
+
+    public static DetailActivityFragment newinstance(String forecastStr) {
+        DetailActivityFragment detailFragment = new DetailActivityFragment();
+        Bundle args = new Bundle();
+        args.putString(Intent.EXTRA_TEXT, forecastStr);
+        detailFragment.setArguments(args);
+        return detailFragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
+        getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
     }
 
     @Override
@@ -100,14 +112,6 @@ public class DetailActivityFragment extends Fragment implements android.support.
         return rootView;
     }
 
-    private Intent createShareIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, forecastStr.concat(" #Sunshine"));
-        return shareIntent;
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_detail_fragment, menu);
@@ -121,6 +125,29 @@ public class DetailActivityFragment extends Fragment implements android.support.
         } else {
             Log.d(LOG_TAG, "Share action is null");
         }
+    }
+
+
+    private Intent createShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, forecastStr.concat(" #Sunshine"));
+        return shareIntent;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(getContext(), SettingsActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -140,45 +167,44 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (!data.moveToFirst()) {
-            return;
-        }
-        int weatherID = data.getInt(COL_WEATHER_ID);
-        int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
+        if (data != null && data.moveToFirst()) {
 
-        iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
+            int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
 
-        long date = data.getLong(COL_WEATHER_DATE);
-        String dateText = Utility.getFormattedMonthDay(getActivity(), date);
-        String dayString = Utility.getDayName(getContext(), date);
-        dayTextView.setText(dayString);
-        String freindlyDateString = Utility.getFormattedMonthDay(getContext(), date);
-        friendlyDateTextView.setText(freindlyDateString);
-        String weatherDesc = data.getString(COL_WEATHER_DESC);
-        descTextView.setText(weatherDesc);
+            iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
 
-        boolean isMetric = Utility.isMetric(getContext());
-        String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
-        highTextView.setText(high);
-        String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
-        lowTextView.setText(low);
+            long date = data.getLong(COL_WEATHER_DATE);
+            String dateText = Utility.getFormattedMonthDay(getActivity(), date);
+            String dayString = Utility.getDayName(getContext(), date);
+            dayTextView.setText(dayString);
+            String freindlyDateString = Utility.getFormattedMonthDay(getContext(), date);
+            friendlyDateTextView.setText(freindlyDateString);
+            String weatherDesc = data.getString(COL_WEATHER_DESC);
+            descTextView.setText(weatherDesc);
 
-        float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
-        humidityTextView.setText(getActivity().getString(R.string.format_humidity, humidity));
+            boolean isMetric = Utility.isMetric(getContext());
+            String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
+            highTextView.setText(high);
+            String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
+            lowTextView.setText(low);
 
-        float pressure = data.getFloat(COL_WEATHER_PRESSURE);
-        pressureTextView.setText(getActivity().getString(R.string.format_pressure, pressure));
+            float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
+            humidityTextView.setText(getActivity().getString(R.string.format_humidity, humidity));
 
-        float windSpeed = data.getFloat(COL_WEATHER_WIND_SPEED);
-        float windDir = data.getFloat(COL_WEATHER_DEGREES);
-        windTextView.setText(Utility.getFormattedWind(getContext(), windSpeed, windDir));
+            float pressure = data.getFloat(COL_WEATHER_PRESSURE);
+            pressureTextView.setText(getActivity().getString(R.string.format_pressure, pressure));
 
-        forecastStr = String.format("%s - %s - %s/%s", dateText, weatherDesc, high, low);
+            float windSpeed = data.getFloat(COL_WEATHER_WIND_SPEED);
+            float windDir = data.getFloat(COL_WEATHER_DEGREES);
+            windTextView.setText(Utility.getFormattedWind(getContext(), windSpeed, windDir));
 
-        if (shareActionProvider != null) {
-            shareActionProvider.setShareIntent(createShareIntent());
-        } else {
-            Log.d(LOG_TAG, "Share action is null");
+            forecastStr = String.format("%s - %s - %s/%s", dateText, weatherDesc, high, low);
+
+            if (shareActionProvider != null) {
+                shareActionProvider.setShareIntent(createShareIntent());
+            } else {
+                Log.d(LOG_TAG, "Share action is null");
+            }
         }
     }
 

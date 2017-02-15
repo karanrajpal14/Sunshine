@@ -4,10 +4,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -49,27 +53,36 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             WeatherContract.LocationEntry.COLUMN_COORD_LAT,
             WeatherContract.LocationEntry.COLUMN_COORD_LONG
     };
-    final String MAINFRAGMENT_TAG = "MF_TAG";
+    //final String MAINFRAGMENT_TAG = "MF_TAG";
     public ForecastAdapter forecastAdapter;
-    private Cursor weatherCursor;
+    private String currentKnownLocation;
 
     public MainActivityFragment() {
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        currentKnownLocation = Utility.getPreferredLocation(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
         forecastAdapter = new ForecastAdapter(getActivity(), null, 0);
-        ListView listView = (ListView) view.findViewById(R.id.listView_forecast);
+
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
         listView.setAdapter(forecastAdapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -86,6 +99,39 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (currentKnownLocation.equals(Utility.getPreferredLocation(getContext()))) {
+            onLocationChanged();
+            currentKnownLocation = Utility.getPreferredLocation(getActivity());
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_forecastfragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(getContext(), SettingsActivity.class));
+            return true;
+        }
+
+        if (id == R.id.action_refresh) {
+            updateWeather();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String locationSetting = Utility.getPreferredLocation(getActivity());
         final String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC"; //Sort Order : Ascending, by date
@@ -93,7 +139,8 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
                 .buildWeatherLocationWithStartDate(locationSetting,
                         System.currentTimeMillis());
 
-        return new CursorLoader(getActivity(), weatherForLocationUri,
+        return new CursorLoader(getActivity(),
+                weatherForLocationUri,
                 FORECAST_COLUMNS,
                 null,
                 null,
@@ -112,12 +159,17 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
 
     public void onLocationChanged() {
         updateWeather();
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     public void updateWeather() {
         FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getActivity());
         String location = Utility.getPreferredLocation(getActivity());
         fetchWeatherTask.execute(location);
+        /*FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getContext());
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String location = pref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
+        String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_metric_key));
+        fetchWeatherTask.execute(location, units);*/
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 }
