@@ -55,6 +55,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     };
     //final String MAINFRAGMENT_TAG = "MF_TAG";
     public ForecastAdapter forecastAdapter;
+    Callback callbackDelegate;
     private String currentKnownLocation;
 
     public MainActivityFragment() {
@@ -88,10 +89,12 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
+                    long date = cursor.getLong(COL_WEATHER_DATE);
                     String locationSetting = Utility.getPreferredLocation(getActivity());
-                    Intent detailsIntent = new Intent(getActivity(), DetailActivity.class);
+                    ((Callback) getActivity()).onItemSelected(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, date));
+                    /*Intent detailsIntent = new Intent(getActivity(), DetailActivity.class);
                     detailsIntent.setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, cursor.getLong(COL_WEATHER_DATE)));
-                    startActivity(detailsIntent);
+                    startActivity(detailsIntent);*/
                 }
             }
         });

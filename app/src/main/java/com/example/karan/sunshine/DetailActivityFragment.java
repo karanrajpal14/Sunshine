@@ -2,6 +2,7 @@ package com.example.karan.sunshine;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import com.example.karan.sunshine.data.WeatherContract;
  */
 public class DetailActivityFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
 
+    static final String DETAIL_URI = "URI";
     // These indices are tied to DETAIL_COLUMNS. If DETAIL_COLUMNS changes, these
     // must change.
     static final int COL_WEATHER_ID = 0;
@@ -59,6 +61,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
     ShareActionProvider shareActionProvider;
+    private Uri mUri;
     private String forecastStr;
     private ImageView iconView;
     private TextView friendlyDateTextView;
@@ -98,6 +101,11 @@ public class DetailActivityFragment extends Fragment implements android.support.
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            mUri = args.getParcelable(DetailActivityFragment.DETAIL_URI);
+        }
 
         iconView = (ImageView) rootView.findViewById(R.id.detail_icon_imageView);
         friendlyDateTextView = (TextView) rootView.findViewById(R.id.detail_friendly_date_textView);
@@ -152,17 +160,16 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent detailsIntent = getActivity().getIntent();
-        if (detailsIntent == null || detailsIntent.getData() == null) {
-            return null;
+        if (mUri != null) {
+            return new CursorLoader(
+                    getContext(),
+                    mUri,
+                    DETAIL_COLUMNS,
+                    null,
+                    null,
+                    null);
         }
-        return new CursorLoader(
-                getContext(),
-                detailsIntent.getData(),
-                DETAIL_COLUMNS,
-                null,
-                null,
-                null);
+        return null;
     }
 
     @Override
@@ -210,6 +217,15 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    void onLocationChanged(String newLocation) {
+        Uri uri = mUri;
+        if (uri != null) {
+            long date = WeatherContract.WeatherEntry.getStartDateFromUri(uri);
+            mUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
+        }
     }
 
 }

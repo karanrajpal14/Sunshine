@@ -14,8 +14,12 @@ public class DetailActivity extends AppCompatActivity {
         //setSupportActionBar(toolbar);
 
         if (savedInstanceState == null) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(DetailActivityFragment.DETAIL_URI, getIntent().getData());
+            DetailActivityFragment detailActivityFragment = new DetailActivityFragment();
+            detailActivityFragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.weather_detail_container, new DetailActivityFragment())
+                    .replace(R.id.weather_detail_container, detailActivityFragment)
                     .commit();
         }
 
