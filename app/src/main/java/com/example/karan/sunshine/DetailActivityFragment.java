@@ -61,8 +61,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
     ShareActionProvider shareActionProvider;
-    private Uri mUri;
-    private String forecastStr;
+    //Views required to set the data fetched from the loader
     private ImageView iconView;
     private TextView friendlyDateTextView;
     private TextView dayTextView;
@@ -72,17 +71,21 @@ public class DetailActivityFragment extends Fragment implements android.support.
     private TextView humidityTextView;
     private TextView windTextView;
     private TextView pressureTextView;
+    private String forecastStr;
+    private Uri dateUri;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
     }
 
-    public static DetailActivityFragment newinstance(String forecastStr) {
-        DetailActivityFragment detailFragment = new DetailActivityFragment();
-        Bundle args = new Bundle();
-        args.putString(Intent.EXTRA_TEXT, forecastStr);
-        detailFragment.setArguments(args);
-        return detailFragment;
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getLoaderManager().initLoader(DETAIL_LOADER_ID,
+                savedInstanceState, this);
+        /*getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID,
+                savedInstanceState, this);*/
     }
 
     @Override
@@ -92,19 +95,13 @@ public class DetailActivityFragment extends Fragment implements android.support.
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            mUri = args.getParcelable(DetailActivityFragment.DETAIL_URI);
+        Bundle dateUriBundle = getArguments();
+        if (dateUriBundle != null) {
+            dateUri = dateUriBundle.getParcelable(DetailActivityFragment.DETAIL_URI);
         }
 
         iconView = (ImageView) rootView.findViewById(R.id.detail_icon_imageView);
@@ -135,7 +132,6 @@ public class DetailActivityFragment extends Fragment implements android.support.
         }
     }
 
-
     private Intent createShareIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -144,26 +140,27 @@ public class DetailActivityFragment extends Fragment implements android.support.
         return shareIntent;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    void onLocationChanged(String newLocation) {
+        Uri currentUri = dateUri;
+        if (currentUri != null) {
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(getContext(), SettingsActivity.class));
+            long date = WeatherContract.WeatherEntry.getDateFromUri(dateUri);
+
+            dateUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                    newLocation, date
+            );
+
+            getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if (mUri != null) {
+
+        if (dateUri != null) {
             return new CursorLoader(
-                    getContext(),
-                    mUri,
+                    getActivity(),
+                    dateUri,
                     DETAIL_COLUMNS,
                     null,
                     null,
@@ -217,15 +214,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    void onLocationChanged(String newLocation) {
-        Uri uri = mUri;
-        if (uri != null) {
-            long date = WeatherContract.WeatherEntry.getStartDateFromUri(uri);
-            mUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
-            getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
-        }
+        forecastStr = null;
     }
 
 }
