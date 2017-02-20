@@ -6,13 +6,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity implements Callback {
 
     //Tag for the detail fragment
     private final String DETAILFRAGMENT_TAG = "DFTAG";
-    //Store current location to verify location change
-    String currentKnownLocation;
+
+    //Store current location and unit to verify change
+    private String currentSetLocation;
+    private String currentSetUnit;
+
     //Flag to verify if device is a large screen device or not
     private boolean twoPane;
 
@@ -21,7 +26,11 @@ public class MainActivity extends AppCompatActivity implements Callback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Remove action bar shadow
+        getSupportActionBar().setElevation(0f);
+
         if (findViewById(R.id.weather_detail_container) != null) {
+            //Device has a wide screen
             twoPane = true;
             if (savedInstanceState == null) {
                 getSupportFragmentManager()
@@ -33,29 +42,64 @@ public class MainActivity extends AppCompatActivity implements Callback {
             }
 
         } else {
+            //Device has a small screen
             twoPane = false;
-            //Remove action bar shadow
-            getSupportActionBar().setElevation(0f);
         }
-        currentKnownLocation = Utility.getPreferredLocation(getApplication());
+
+        //Get the currently set values for Location and Units from SharedPreferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        currentSetLocation = preferences.getString(
+                getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default_value)
+        );
+        currentSetUnit = preferences.getString(
+                getString(R.string.pref_units_key),
+                getString(R.string.pref_units_metric_key)
+        );
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String newLocationSetting = sharedPreferences.getString(
+        //Retrieve location and unit values from Shared Preferences
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String newSetLocation = sharedPreferences.getString(
                 getString(R.string.pref_location_key),
                 getString(R.string.pref_location_default_value)
         );
-
-        String newUnitSetting = sharedPreferences.getString(
+        String newSetUnit = sharedPreferences.getString(
                 getString(R.string.pref_units_key),
                 getString(R.string.pref_units_metric_key)
         );
 
-        if (!currentKnownLocation.equals(newLocationSetting)) {
+        //Check if they have been changed
+        //If yes, request for an update
+        //If not, let the curent data remain
+        if (!currentSetLocation.equals(newSetLocation)) {
 
             //Get main fragment object
             MainActivityFragment mainFragment = (MainActivityFragment) getSupportFragmentManager()
@@ -71,13 +115,33 @@ public class MainActivity extends AppCompatActivity implements Callback {
                     .findFragmentByTag(DETAILFRAGMENT_TAG);
 
             if (detailFragment != null) {
-                detailFragment.onLocationChanged(newLocationSetting);
+                detailFragment.onLocationChanged(newSetLocation);
             }
 
-            currentKnownLocation = newLocationSetting;
+            currentSetLocation = newSetLocation;
         }
 
-        // TODO: 18-Feb-17 Do the same for unit change as well
+        if (!currentSetUnit.equals(newSetUnit)) {
+
+            //Get main fragment object
+            MainActivityFragment mainFragment = (MainActivityFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.fragment_main);
+
+            if (mainFragment != null) {
+                //Update main fragment due to unit change
+                mainFragment.onUnitChanged();
+            }
+
+            //Get detail fragment object
+            DetailActivityFragment detailFragment = (DetailActivityFragment) getSupportFragmentManager()
+                    .findFragmentByTag(DETAILFRAGMENT_TAG);
+
+            if (detailFragment != null) {
+                detailFragment.onUnitChanged();
+            }
+
+            currentSetUnit = newSetUnit;
+        }
     }
 
     @Override
@@ -99,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
                             DETAILFRAGMENT_TAG)
                     .commit();
         }
-        //If device isn't a large scrren device then start the Detail Activity
+        //If device isn't a large screen device then start the Detail Activity
         else {
             Intent intent = new Intent(this, DetailActivity.class);
             intent.setData(dateUri);

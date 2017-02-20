@@ -154,6 +154,12 @@ public class DetailActivityFragment extends Fragment implements android.support.
         }
     }
 
+    public void onUnitChanged() {
+        if (getLoaderManager().getLoader(DETAIL_LOADER_ID) != null) {
+            getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
+        }
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
