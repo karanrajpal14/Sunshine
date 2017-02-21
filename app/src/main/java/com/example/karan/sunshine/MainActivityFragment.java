@@ -64,6 +64,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     public ForecastAdapter forecastAdapter;
     private ListView listView;
     private int lastSelectedIndex = ListView.INVALID_POSITION;
+    private boolean useTodayLayout;
     //final String MAINFRAGMENT_TAG = "MF_TAG";
 
     public MainActivityFragment() {
@@ -119,6 +120,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         forecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+        forecastAdapter.setUseTodayLayout(useTodayLayout);
 
         //Getting a reference to the ListView and attaching an adapter to it
         listView = (ListView) view.findViewById(R.id.listview_forecast);
@@ -128,7 +130,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-
                 if (cursor != null && cursor.getCount() != 0) {
 
                     long date = cursor.getLong(COL_WEATHER_DATE);
@@ -140,12 +141,15 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             }
         });
 
+        //listView.callOnClick();
+
         //Check if theres is a savedInstance state.
         //If present, get it and retrieve the position using the SELECTED_POSITION_KEY
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_POSTION_KEY)) {
             Log.d(TAG, "onCreateView: Position found. Fetching.");
             lastSelectedIndex = savedInstanceState.getInt(SELECTED_POSTION_KEY);
         }
+        forecastAdapter.setUseTodayLayout(useTodayLayout);
         return view;
     }
 
@@ -201,6 +205,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         forecastAdapter.swapCursor(data);
+
         if (lastSelectedIndex != ListView.INVALID_POSITION) {
             Log.d(TAG, "onLoadFinished: Scrolling to position: " + lastSelectedIndex);
             listView.smoothScrollToPosition(lastSelectedIndex);
@@ -212,4 +217,10 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         forecastAdapter.swapCursor(null);
     }
 
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        this.useTodayLayout = useTodayLayout;
+        if (forecastAdapter != null) {
+            forecastAdapter.setUseTodayLayout(this.useTodayLayout);
+        }
+    }
 }

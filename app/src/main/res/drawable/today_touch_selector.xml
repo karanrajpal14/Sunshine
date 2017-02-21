@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true">
-        <ripple android:color="@color/grey" />
-    </item>
+    <item android:drawable="@color/sunshine_light_blue" android:state_pressed="true" />
 
     <item android:drawable="@color/sunshine_light_blue" android:state_activated="true" />
 
     <item android:drawable="@color/sunshine_light_blue" android:state_selected="true" />
 
-    m
-    <item android:drawable="@color/sunshine_blue" />
+    <item android:drawable="@android:color/transparent" />
 </selector>

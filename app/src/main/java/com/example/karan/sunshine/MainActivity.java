@@ -26,9 +26,6 @@ public class MainActivity extends AppCompatActivity implements Callback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Remove action bar shadow
-        getSupportActionBar().setElevation(0f);
-
         if (findViewById(R.id.weather_detail_container) != null) {
             //Device has a wide screen
             twoPane = true;
@@ -42,9 +39,14 @@ public class MainActivity extends AppCompatActivity implements Callback {
             }
 
         } else {
+            //Remove action bar shadow on smaller screen devices
+            getSupportActionBar().setElevation(0f);
             //Device has a small screen
             twoPane = false;
         }
+
+        MainActivityFragment mainActivityFragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+        mainActivityFragment.setUseTodayLayout(!twoPane);
 
         //Get the currently set values for Location and Units from SharedPreferences
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
