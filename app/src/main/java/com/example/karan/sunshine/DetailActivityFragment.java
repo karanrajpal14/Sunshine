@@ -71,6 +71,9 @@ public class DetailActivityFragment extends Fragment implements android.support.
     private TextView humidityTextView;
     private TextView windTextView;
     private TextView pressureTextView;
+    private ImageView compassImageView;
+    private CompassView windVaneView;
+
     private String forecastStr;
     private Uri dateUri;
 
@@ -84,8 +87,6 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
         getLoaderManager().initLoader(DETAIL_LOADER_ID,
                 savedInstanceState, this);
-        /*getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID,
-                savedInstanceState, this);*/
     }
 
     @Override
@@ -113,6 +114,8 @@ public class DetailActivityFragment extends Fragment implements android.support.
         humidityTextView = (TextView) rootView.findViewById(R.id.detail_humidity_textView);
         windTextView = (TextView) rootView.findViewById(R.id.detail_wind_textView);
         pressureTextView = (TextView) rootView.findViewById(R.id.detail_pressure_textView);
+        compassImageView = (ImageView) rootView.findViewById(R.id.detail_compass_view);
+        windVaneView = (CompassView) rootView.findViewById(R.id.detail_wind_vane_view);
 
         return rootView;
     }
@@ -187,8 +190,8 @@ public class DetailActivityFragment extends Fragment implements android.support.
             String dateText = Utility.getFormattedMonthDay(getActivity(), date);
             String dayString = Utility.getDayName(getContext(), date);
             dayTextView.setText(dayString);
-            String freindlyDateString = Utility.getFormattedMonthDay(getContext(), date);
-            friendlyDateTextView.setText(freindlyDateString);
+            String friendlyDateString = Utility.getFormattedMonthDay(getContext(), date);
+            friendlyDateTextView.setText(friendlyDateString);
             String weatherDesc = data.getString(COL_WEATHER_DESC);
             descTextView.setText(weatherDesc);
 
@@ -207,6 +210,10 @@ public class DetailActivityFragment extends Fragment implements android.support.
             float windSpeed = data.getFloat(COL_WEATHER_WIND_SPEED);
             float windDir = data.getFloat(COL_WEATHER_DEGREES);
             windTextView.setText(Utility.getFormattedWind(getContext(), windSpeed, windDir));
+
+            //compassImageView.setVisibility(View.VISIBLE);
+            windVaneView.setVisibility(View.VISIBLE);
+            windVaneView.setVaneDirection(windDir, Utility.getFormattedWind(getContext(), windSpeed, windDir));
 
             forecastStr = String.format("%s - %s - %s/%s", dateText, weatherDesc, high, low);
 
