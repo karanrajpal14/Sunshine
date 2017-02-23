@@ -1,10 +1,8 @@
 package com.example.karan.sunshine;
 
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -19,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.karan.sunshine.data.WeatherContract;
+import com.example.karan.sunshine.sync.SunshineSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -61,11 +60,11 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             WeatherContract.LocationEntry.COLUMN_COORD_LAT,
             WeatherContract.LocationEntry.COLUMN_COORD_LONG
     };
+
     public ForecastAdapter forecastAdapter;
     private ListView listView;
     private int lastSelectedIndex = ListView.INVALID_POSITION;
     private boolean useTodayLayout;
-    //final String MAINFRAGMENT_TAG = "MF_TAG";
 
     public MainActivityFragment() {
     }
@@ -154,18 +153,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     }
 
     public void updateWeather() {
-        //Get stored preferences and use them to initiate an update
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String location = pref.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
-        String units = pref.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_metric_key));
-
-        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getActivity());
-        fetchWeatherTask.execute(location);
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
-
-        /*String location = Utility.getPreferredLocation(getActivity());
-        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(getContext());
-        fetchWeatherTask.execute(location, units);*/
+        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     public void onLocationChanged() {

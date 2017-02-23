@@ -89,8 +89,8 @@
 
                 <ImageView
                     android:id="@+id/detail_compass_view"
-                    android:layout_width="400px"
-                    android:layout_height="400px"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/compass"
                     android:visibility="invisible" />
 

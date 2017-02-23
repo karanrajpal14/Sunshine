@@ -24,12 +24,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-class Utility {
+public class Utility {
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
     private static final String DATE_FORMAT = "yyyyMMdd";
 
-    static String getPreferredLocation(Context context) {
+    public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_location_key),
                 context.getString(R.string.pref_location_default_value));

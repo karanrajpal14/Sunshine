@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.karan.sunshine.sync.SunshineSyncAdapter;
+
 public class MainActivity extends AppCompatActivity implements Callback {
 
     //Tag for the detail fragment
@@ -58,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements Callback {
                 getString(R.string.pref_units_key),
                 getString(R.string.pref_units_metric_key)
         );
+
+        SunshineSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
