@@ -37,9 +37,9 @@ import java.util.Vector;
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static final String TAG = SunshineSyncAdapter.class.getSimpleName();
-    // Interval at which to sync with the weather, in milliseconds.
+    // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute)  * 180 = 3 hours
-    public static final int SYNC_INTERVAL = 5 * 100;
+    public static final int SYNC_INTERVAL = 5 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
