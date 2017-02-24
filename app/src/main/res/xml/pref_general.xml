@@ -6,6 +6,11 @@
         android:key="location"
         android:title="@string/pref_location_title" />
 
+    <Preference
+        android:key="viewOnMap"
+        android:summary="Tap this to view your selected location on a map"
+        android:title="View Location on Map" />
+
     <ListPreference
         android:defaultValue="@string/pref_units_metric_key"
         android:enabled="true"
@@ -15,9 +20,11 @@
         android:summary="@string/pref_units_summary"
         android:title="@string/pref_units_title" />
 
-    <Preference
-        android:key="viewOnMap"
-        android:summary="Tap this to view your selected location on a map"
-        android:title="View Location on Map" />
+    <CheckBoxPreference
+        android:defaultValue="@string/pref_notification_default_value"
+        android:key="@string/pref_notification_key"
+        android:summaryOff="@string/pref_notification_disabled"
+        android:summaryOn="@string/pref_notification_enabled"
+        android:title="@string/pref_notification_title" />
 
 </PreferenceScreen>

@@ -42,15 +42,19 @@ public class SettingsActivity extends PreferenceActivity
             public boolean onPreferenceClick(Preference preference) {
                 Toast.makeText(getBaseContext(), "Button works", Toast.LENGTH_LONG).show();
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                String location = preferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default_value));
-                Uri geolocation = Uri.parse("geo:0,0").buildUpon().appendQueryParameter("q", location).build();
+
+                String lat = preferences.getString(getString(R.string.pref_view_on_map_latitude_key), null);
+                String lon = preferences.getString(getString(R.string.pref_view_on_map_longitude_key), null);
+                Uri geolocation = Uri.parse("geo:" + lat + "," + lon);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(geolocation);
-                if (intent.resolveActivity(getPackageManager()) != null) {
+
+                if (intent.resolveActivity(getPackageManager()) != null && lat != null && lon != null) {
                     startActivity(intent);
                 } else {
                     Log.d("Couldn't start activity", " no application handler found");
                 }
+
                 return true;
             }
         });

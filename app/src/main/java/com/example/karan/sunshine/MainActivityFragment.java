@@ -1,16 +1,15 @@
 package com.example.karan.sunshine;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -88,27 +87,47 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        //setHasOptionsMenu(true);
         //currentKnownLocation = Utility.getPreferredLocation(getActivity());
     }
 
-    @Override
+    /*@Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_forecastfragment, menu);
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_refresh) {
+        *//*if (id == R.id.action_refresh) {
             updateWeather();
             return true;
-        }
+        }*//*
+
         return super.onOptionsItemSelected(item);
+    }*/
+
+    private void saveSetLocationToPreferences() {
+        Log.d(TAG, "saveSetLocationToPreferences: Location prefs");
+        Cursor c = forecastAdapter.getCursor();
+        if (c != null && c.moveToFirst()) {
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(
+                    getString(R.string.pref_view_on_map_latitude_key),
+                    c.getString(COL_COORD_LAT)
+            );
+            editor.putString(
+                    getString(R.string.pref_view_on_map_longitude_key),
+                    c.getString(COL_COORD_LONG));
+            editor.apply();
+        }
+        Log.d(TAG, "saveSetLocationToPreferences: Location preferences written");
     }
 
     @Override
@@ -198,6 +217,8 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             Log.d(TAG, "onLoadFinished: Scrolling to position: " + lastSelectedIndex);
             listView.smoothScrollToPosition(lastSelectedIndex);
         }
+
+        saveSetLocationToPreferences();
     }
 
     @Override
