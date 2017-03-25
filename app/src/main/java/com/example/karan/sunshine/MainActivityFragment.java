@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.karan.sunshine.data.WeatherContract;
 import com.example.karan.sunshine.sync.SunshineSyncAdapter;
@@ -91,26 +92,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         //currentKnownLocation = Utility.getPreferredLocation(getActivity());
     }
 
-    /*@Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_forecastfragment, menu);
-    }*/
-
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        *//*if (id == R.id.action_refresh) {
-            updateWeather();
-            return true;
-        }*//*
-
-        return super.onOptionsItemSelected(item);
-    }*/
-
     private void saveSetLocationToPreferences() {
         Log.d(TAG, "saveSetLocationToPreferences: Location prefs");
         Cursor c = forecastAdapter.getCursor();
@@ -142,6 +123,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
 
         //Getting a reference to the ListView and attaching an adapter to it
         listView = (ListView) view.findViewById(R.id.listview_forecast);
+        listView.setEmptyView(view.findViewById(R.id.empty_text_view));
         listView.setAdapter(forecastAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -169,6 +151,19 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         }
         forecastAdapter.setUseTodayLayout(useTodayLayout);
         return view;
+    }
+
+    public void updateEmptyView() {
+        if (forecastAdapter.getCount() == 0) {
+            TextView emptyView = (TextView) getView().findViewById(R.id.empty_text_view);
+            if (emptyView != null) {
+                int message = R.string.main_activity_empty_view;
+                if (!Utility.checkNetworkState(getContext())) {
+                    message = R.string.main_activity_empty_view_no_internet;
+                }
+                emptyView.setText(message);
+            }
+        }
     }
 
     public void updateWeather() {
@@ -211,13 +206,14 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
         forecastAdapter.swapCursor(data);
 
         if (lastSelectedIndex != ListView.INVALID_POSITION) {
             Log.d(TAG, "onLoadFinished: Scrolling to position: " + lastSelectedIndex);
             listView.smoothScrollToPosition(lastSelectedIndex);
         }
-
+        updateEmptyView();
         saveSetLocationToPreferences();
     }
 

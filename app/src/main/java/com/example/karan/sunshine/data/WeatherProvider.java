@@ -30,6 +30,7 @@ public class WeatherProvider extends ContentProvider {
     static final int WEATHER_WITH_LOCATION = 101;
     static final int WEATHER_WITH_LOCATION_AND_DATE = 102;
     static final int LOCATION = 300;
+
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
@@ -209,6 +210,7 @@ public class WeatherProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        //Watches the content uri for changes
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }

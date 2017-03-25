@@ -25,6 +25,9 @@
 
     <string name="action_share">Share</string>
 
+    <string name="main_activity_empty_view">No weather information available.</string>
+    <string name="main_activity_empty_view_no_internet">No weather information available. Please connect to the internet and try again.</string>
+
     <!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
     <string name="today">Today</string>
 
