@@ -16,7 +16,7 @@
         android:id="@+id/detail_main_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
+        android:layout_gravity="start"
         android:gravity="center_vertical"
         android:orientation="vertical"
 
@@ -52,7 +52,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:gravity="start"
                 android:orientation="vertical">
 
                 <TextView
@@ -86,6 +86,7 @@
                     android:id="@+id/detail_icon_imageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="Forecast Icon"
                     tools:src="@drawable/art_storm" />
 
                 <TextView
@@ -103,6 +104,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginEnd="0dp"
             android:layout_marginRight="0dp"
             android:layout_marginTop="16dp"
             android:orientation="vertical">
@@ -131,6 +133,7 @@
                     android:layout_width="400px"
                     android:layout_height="400px"
                     android:background="@drawable/compass"
+                    android:contentDescription="Wind Direction"
                     android:visibility="invisible" />
 
                 <com.example.karan.sunshine.CompassView
@@ -138,10 +141,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@id/detail_compass_view"
+                    android:layout_alignEnd="@id/detail_compass_view"
                     android:layout_alignLeft="@id/detail_compass_view"
                     android:layout_alignRight="@id/detail_compass_view"
+                    android:layout_alignStart="@id/detail_compass_view"
                     android:layout_alignTop="@id/detail_compass_view"
                     android:layout_marginLeft="25dp"
+                    android:layout_marginStart="25dp"
                     android:layout_marginTop="28dp"
                     android:visibility="invisible" />
 

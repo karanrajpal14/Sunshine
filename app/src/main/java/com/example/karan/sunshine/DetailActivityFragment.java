@@ -184,36 +184,46 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
             int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
 
-            iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
-
             long date = data.getLong(COL_WEATHER_DATE);
             String dateText = Utility.getFormattedMonthDay(getActivity(), date);
             String dayString = Utility.getDayName(getContext(), date);
             dayTextView.setText(dayString);
             String friendlyDateString = Utility.getFormattedMonthDay(getContext(), date);
             friendlyDateTextView.setText(friendlyDateString);
+
             String weatherDesc = data.getString(COL_WEATHER_DESC);
             descTextView.setText(weatherDesc);
+            descTextView.setContentDescription(getString(R.string.a11y_forecast, weatherDesc));
+
+            iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
+            iconView.setContentDescription(getString(R.string.a11y_forecast_icon, weatherDesc));
 
             boolean isMetric = Utility.isMetric(getContext());
             String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
             highTextView.setText(high);
+            highTextView.setContentDescription(getString(R.string.a11y_high_temp, high));
+
             String low = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
             lowTextView.setText(low);
+            lowTextView.setContentDescription(getString(R.string.a11y_low_temp, low));
 
             float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
             humidityTextView.setText(getActivity().getString(R.string.format_humidity, humidity));
+            humidityTextView.setContentDescription(humidityTextView.getText());
 
             float pressure = data.getFloat(COL_WEATHER_PRESSURE);
             pressureTextView.setText(getActivity().getString(R.string.format_pressure, pressure));
+            pressureTextView.setContentDescription(pressureTextView.getText());
 
             float windSpeed = data.getFloat(COL_WEATHER_WIND_SPEED);
             float windDir = data.getFloat(COL_WEATHER_DEGREES);
             windTextView.setText(Utility.getFormattedWind(getContext(), windSpeed, windDir));
+            windTextView.setContentDescription(windTextView.getText());
 
             //compassImageView.setVisibility(View.VISIBLE);
             windVaneView.setVisibility(View.VISIBLE);
             windVaneView.setVaneDirection(windDir, Utility.getFormattedWind(getContext(), windSpeed, windDir));
+            windVaneView.setContentDescription(windTextView.getText());
 
             forecastStr = String.format("%s - %s - %s/%s", dateText, weatherDesc, high, low);
 

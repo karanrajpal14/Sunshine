@@ -55,6 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:textColor="@color/grey_700"
                 android:textSize="48sp" />
 
@@ -92,6 +93,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/compass"
+                    android:contentDescription="Wind Direction"
                     android:visibility="invisible" />
 
                 <com.example.karan.sunshine.CompassView
@@ -99,10 +101,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@id/detail_compass_view"
+                    android:layout_alignEnd="@id/detail_compass_view"
                     android:layout_alignLeft="@id/detail_compass_view"
                     android:layout_alignRight="@id/detail_compass_view"
+                    android:layout_alignStart="@id/detail_compass_view"
                     android:layout_alignTop="@id/detail_compass_view"
                     android:layout_marginLeft="25dp"
+                    android:layout_marginStart="25dp"
                     android:layout_marginTop="28dp"
                     android:visibility="invisible" />
 
@@ -114,13 +119,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/detail_icon_imageView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:contentDescription="Forecast Icon" />
 
             <TextView
                 android:id="@+id/detail_forecast_textView"
