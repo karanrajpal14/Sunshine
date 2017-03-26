@@ -22,7 +22,7 @@ import com.example.karan.sunshine.sync.SunshineSyncAdapter;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends android.support.v4.app.Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivityFragment extends android.support.v4.app.Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
@@ -158,8 +158,21 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             TextView emptyView = (TextView) getView().findViewById(R.id.empty_text_view);
             if (emptyView != null) {
                 int message = R.string.main_activity_empty_view;
-                if (!Utility.checkNetworkState(getContext())) {
-                    message = R.string.main_activity_empty_view_no_internet;
+                @SunshineSyncAdapter.LocationStatus int locationStatus = Utility.getLocationStatus(getActivity());
+                switch (locationStatus) {
+                    case SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_SERVER_DOWN:
+                        message = R.string.main_activity_empty_view_server_down;
+                        break;
+                    case SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_SERVER_INVALID:
+                        message = R.string.main_activity_empty_view_server_error;
+                        break;
+                    case SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_INVALID:
+                        message = R.string.main_activity_empty_view_location_invalid;
+                        break;
+                    default:
+                        if (!Utility.checkNetworkState(getActivity())) {
+                            message = R.string.main_activity_empty_view_no_internet;
+                        }
                 }
                 emptyView.setText(message);
             }
@@ -227,5 +240,27 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         if (forecastAdapter != null) {
             forecastAdapter.setUseTodayLayout(this.useTodayLayout);
         }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        if (key.equals(getString(R.string.pref_location_status_key))) {
+            updateEmptyView();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        preferences.registerOnSharedPreferenceChangeListener(this);
+        super.onResume();
     }
 }

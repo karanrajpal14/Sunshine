@@ -22,6 +22,8 @@ import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
 
+import com.example.karan.sunshine.sync.SunshineSyncAdapter;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,6 +32,22 @@ public class Utility {
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
     private static final String DATE_FORMAT = "yyyyMMdd";
+
+    @SuppressWarnings("ResourceType")
+    public static
+    @SunshineSyncAdapter.LocationStatus
+    int getLocationStatus(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getInt(context.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_UNKNOWN);
+    }
+
+
+    public static void resetLocationStatus(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor edit = preferences.edit();
+        edit.putInt(context.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_UNKNOWN);
+        edit.apply();
+    }
 
     public static boolean checkNetworkState(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -23,10 +23,19 @@
     <string name="pref_units_imperial_title">Imperial</string>
     <string name="pref_units_imperial_key">imperial</string>
 
+    <string name="pref_location_status_key">location-status</string>
+
     <string name="action_share">Share</string>
 
     <string name="main_activity_empty_view">No weather information available.</string>
     <string name="main_activity_empty_view_no_internet">No weather information available. Please connect to the internet and try again.</string>
+    <string name="main_activity_empty_view_server_down">No weather information available. The server is not returning data. It must be down. </string>
+    <string name="main_activity_empty_view_server_error">No weather information available. The server is not returning valid data. Please check for an updated version of Sunshine.</string>
+    <string name="main_activity_empty_view_location_invalid">No weather information available. The location you have entered is invalid. Please enter a valid location. </string>
+
+    <!-- Strings used when displaying the state of the Location in settings -->
+    <string name="pref_location_error_description">Invalid Location (<xliff:g id="location_setting">%1$s</xliff:g>)"</string>
+    <string name="pref_location_unknown_description">Validating Location… (<xliff:g id="location_setting">%1$s</xliff:g>)"</string>
 
     <!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
     <string name="today">Today</string>

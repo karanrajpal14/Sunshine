@@ -13,6 +13,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.karan.sunshine.data.WeatherContract;
+import com.example.karan.sunshine.sync.SunshineSyncAdapter;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
  * <p>
@@ -22,7 +25,7 @@ import android.widget.Toast;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity
-        implements Preference.OnPreferenceChangeListener {
+        implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -87,6 +90,7 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         String stringValue = value.toString();
+        String key = preference.getKey();
 
         if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in
@@ -95,6 +99,21 @@ public class SettingsActivity extends PreferenceActivity
             int prefIndex = listPreference.findIndexOfValue(stringValue);
             if (prefIndex >= 0) {
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
+            } else if (key.equals(getString(R.string.pref_location_status_key))) {
+                @SunshineSyncAdapter.LocationStatus int status = Utility.getLocationStatus(getApplication());
+                switch (status) {
+                    case SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_OK:
+                        preference.setSummary(stringValue);
+                        break;
+                    case SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_UNKNOWN:
+                        preference.setSummary(getString(R.string.pref_location_unknown_description));
+                        break;
+                    case SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_INVALID:
+                        preference.setSummary(getString(R.string.pref_location_error_description));
+                        break;
+                    default:
+                        preference.setSummary(stringValue);
+                }
             }
         } else {
             // For other preferences, set the summary to the value's simple string representation.
@@ -103,4 +122,28 @@ public class SettingsActivity extends PreferenceActivity
         return true;
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        if (key.equals(getString(R.string.pref_location_key))) {
+            Utility.resetLocationStatus(this);
+            SunshineSyncAdapter.syncImmediately(this);
+        } else if (key.equals(getString(R.string.pref_units_key))) {
+            getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences.registerOnSharedPreferenceChangeListener(this);
+        super.onResume();
+    }
 }

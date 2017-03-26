@@ -1,10 +1,20 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/com.example.karan.sunshine">
 
-    <EditTextPreference
+    <com.example.karan.sunshine.LocationEditTextPreference
+        android:defaultValue="94043"
+        android:inputType="text"
+        android:key="@string/pref_location_key"
+        android:singleLine="true"
+        android:title="@string/pref_location_title"
+        custom:minLength="3" />
+
+    <!--<EditTextPreference
         android:defaultValue="94043"
         android:enabled="true"
         android:key="location"
-        android:title="@string/pref_location_title" />
+        android:title="@string/pref_location_title"
+        android:inputType="text"/>-->
 
     <Preference
         android:key="viewOnMap"
