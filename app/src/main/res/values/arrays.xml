@@ -11,4 +11,14 @@
         <item>@string/pref_units_imperial_key</item>
     </string-array>
 
+    <string-array name="icon_pack_entries">
+        <item>@string/icon_pack_colored_title</item>
+        <item>@string/icon_pack_mono_title</item>
+    </string-array>
+
+    <string-array name="icon_pack_values">
+        <item>@string/pref_art_pack_sunshine</item>
+        <item>@string/pref_art_pack_mono</item>
+    </string-array>
+
 </resources>

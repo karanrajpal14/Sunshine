@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
@@ -45,6 +47,7 @@ class ForecastAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         int viewType = getItemViewType(cursor.getPosition());
         int layoutID = -1;
+
         if (viewType == VIEW_TYPE_TODAY)
             layoutID = R.layout.list_item_forecast_today;
         else if (viewType == VIEW_TYPE_FUTURE_DAY)
@@ -60,22 +63,26 @@ class ForecastAdapter extends CursorAdapter {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
 
-        /*TextView tv = (TextView) view.findViewById(R.id.textView_listItem);
-        tv.setText(convertCursorRowToUXFormat(cursor));*/
-
         ViewHolder viewHolder = new ViewHolder(view);
 
         int viewType = getItemViewType(cursor.getPosition());
         int weatherConditionID = cursor.getInt(MainActivityFragment.COL_WEATHER_CONDITION_ID);
-        int imageResourceID = 0;
+        int fallbackIconId = 0;
 
-        if (viewType == VIEW_TYPE_TODAY) {
-            imageResourceID = Utility.getArtResourceForWeatherCondition(weatherConditionID);
-        } else if (viewType == VIEW_TYPE_FUTURE_DAY) {
-            imageResourceID = Utility.getIconResourceForWeatherCondition(weatherConditionID);
+        switch (viewType) {
+            case VIEW_TYPE_TODAY:
+                fallbackIconId = Utility.getArtResourceForWeatherCondition(weatherConditionID);
+                break;
+            default:
+                fallbackIconId = Utility.getIconResourceForWeatherCondition(weatherConditionID);
+                break;
         }
 
-        viewHolder.iconView.setImageResource(imageResourceID);
+        Glide.with(context)
+                .load(Utility.getArtUrlForWeatherCondition(context, weatherConditionID))
+                .error(fallbackIconId)
+                .crossFade()
+                .into(viewHolder.iconView);
 
         String date = Utility.getFriendlyDayString(mContext, cursor.getLong(MainActivityFragment.COL_WEATHER_DATE));
         viewHolder.dateTextView.setText(date);

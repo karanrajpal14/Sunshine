@@ -37,4 +37,13 @@
         android:summaryOn="@string/pref_notification_enabled"
         android:title="@string/pref_notification_title" />
 
+    <ListPreference
+        android:defaultValue="@string/icon_pack_colored_key"
+        android:enabled="true"
+        android:entries="@array/icon_pack_entries"
+        android:entryValues="@array/icon_pack_values"
+        android:key="@string/pref_icon_pack_key"
+        android:summary="Select preferred icon pack here"
+        android:title="Icon Pack" />
+
 </PreferenceScreen>

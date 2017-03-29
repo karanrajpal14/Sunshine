@@ -14,7 +14,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +28,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
 import com.example.karan.sunshine.BuildConfig;
 import com.example.karan.sunshine.MainActivity;
 import com.example.karan.sunshine.R;
@@ -44,6 +48,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.karan.sunshine.sync.SunshineSyncAdapter.LocationStatus.LOCATION_STATUS_INVALID;
@@ -523,7 +528,37 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 int iconId = Utility.getIconResourceForWeatherCondition(weatherId);
                 String title = context.getString(R.string.app_name);
                 boolean isMetric = Utility.isMetric(context);
+                Resources resources = context.getResources();
+                int artResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
+                String artResourceURL = Utility.getArtUrlForWeatherCondition(context, weatherId);
 
+                //On honeycomb and higher, we can fetch the large icon size
+                //Prior to that, we have to specify it explicitly
+                int largeIconWidth = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
+                        resources.getDimensionPixelSize(android.R.dimen.notification_large_icon_width)
+                        :
+                        resources.getDimensionPixelSize(R.dimen.notification_large_icon_default);
+
+                int largeIconHeight = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
+                        resources.getDimensionPixelSize(android.R.dimen.notification_large_icon_height)
+                        :
+                        resources.getDimensionPixelSize(R.dimen.notification_large_icon_default);
+
+                //Retrieve large icon
+                Bitmap largeIcon;
+                try {
+                    largeIcon = Glide.with(context)
+                            .load(artResourceURL)
+                            .asBitmap()
+                            .error(artResourceId)
+                            .fitCenter()
+                            .into(largeIconWidth, largeIconHeight)
+                            .get();
+
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    largeIcon = BitmapFactory.decodeResource(resources, artResourceId);
+                }
 
                 // Define the text of the forecast.
                 String contentText = String.format(context.getString(R.string.format_notification),
@@ -535,6 +570,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 NotificationCompat.Builder builder = new android.support.v4.app.NotificationCompat.Builder(context)
                         .setSmallIcon(iconId)
                         .setContentTitle(title)
+                        .setLargeIcon(largeIcon)
                         .setContentText(contentText);
 
                 //Building a artificial back stack to return to

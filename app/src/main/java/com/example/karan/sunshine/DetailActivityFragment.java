@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.karan.sunshine.data.WeatherContract;
 
 /**
@@ -195,7 +196,11 @@ public class DetailActivityFragment extends Fragment implements android.support.
             descTextView.setText(weatherDesc);
             descTextView.setContentDescription(getString(R.string.a11y_forecast, weatherDesc));
 
-            iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
+            Glide.with(this)
+                    .load(Utility.getArtUrlForWeatherCondition(getActivity(), weatherConditionId))
+                    .error(Utility.getArtResourceForWeatherCondition(weatherConditionId))
+                    .crossFade()
+                    .into(iconView);
             iconView.setContentDescription(getString(R.string.a11y_forecast_icon, weatherDesc));
 
             boolean isMetric = Utility.isMetric(getContext());
