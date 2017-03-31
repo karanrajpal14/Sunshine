@@ -6,20 +6,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.karan.sunshine.sync.SunshineSyncAdapter;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity implements Callback {
 
+    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     //Tag for the detail fragment
     private final String DETAILFRAGMENT_TAG = "DFTAG";
-
     //Store current location and unit to verify change
     private String currentSetLocation;
     private String currentSetUnit;
-
     //Flag to verify if device is a large screen device or not
     private boolean twoPane;
 
@@ -62,6 +65,18 @@ public class MainActivity extends AppCompatActivity implements Callback {
         );
 
         SunshineSyncAdapter.initializeSyncAdapter(this);
+
+        if (checkPlayServices()) {
+            // Because this is the initial creation of the app, we'll want to be certain we have
+            // a token. If we do not, then we will start the IntentService that will register this
+            // application with GCM.
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean sentToken = sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false);
+            /*if (!sentToken) {
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+            }*/
+        }
     }
 
     @Override
@@ -104,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
 
         //Check if they have been changed
         //If yes, request for an update
-        //If not, let the curent data remain
+        //If not, let the current data remain
         if (!currentSetLocation.equals(newSetLocation)) {
 
             //Get main fragment object
@@ -175,5 +190,26 @@ public class MainActivity extends AppCompatActivity implements Callback {
             intent.setData(dateUri);
             startActivity(intent);
         }
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i("MainActivity", "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
     }
 }

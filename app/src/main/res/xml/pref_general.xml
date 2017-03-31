@@ -9,13 +9,6 @@
         android:title="@string/pref_location_title"
         custom:minLength="3" />
 
-    <!--<EditTextPreference
-        android:defaultValue="94043"
-        android:enabled="true"
-        android:key="location"
-        android:title="@string/pref_location_title"
-        android:inputType="text"/>-->
-
     <Preference
         android:key="viewOnMap"
         android:summary="Tap this to view your selected location on a map"
