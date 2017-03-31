@@ -1,4 +1,4 @@
-package com.example.karan.sunshine;
+package com.example.karan.sunshine.fcm;
 
 import android.util.Log;
 
@@ -18,8 +18,11 @@ public class MyInstanceIDListenerService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, "Refreshed token: " + refreshedToken);
-        // TODO: Implement this method to send any registration to your app's servers.
-        //sendRegistrationToServer(refreshedToken);
+        sendRegistrationToServer(refreshedToken);
+    }
+
+    private void sendRegistrationToServer(String token) {
+
+        Log.d(TAG, "Refreshed token: " + token);
     }
 }

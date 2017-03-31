@@ -67,12 +67,12 @@ public class MainActivity extends AppCompatActivity implements Callback {
         SunshineSyncAdapter.initializeSyncAdapter(this);
 
         if (checkPlayServices()) {
-            // Because this is the initial creation of the app, we'll want to be certain we have
+            /*// Because this is the initial creation of the app, we'll want to be certain we have
             // a token. If we do not, then we will start the IntentService that will register this
             // application with GCM.
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean sentToken = sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false);
-            /*if (!sentToken) {
+            if (!sentToken) {
                 Intent intent = new Intent(this, RegistrationIntentService.class);
                 startService(intent);
             }*/
