@@ -9,7 +9,7 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v7.app.NotificationCompat;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.example.karan.sunshine.MainActivity;
 import com.example.karan.sunshine.R;
@@ -31,10 +31,10 @@ public class MyFcmListenerService extends FirebaseMessagingService {
             String from = remoteMessage.getFrom();
 
             String senderID = getString(R.string.gcm_defaultSenderId);
-            Toast.makeText(this, "SenderID : " + senderID, Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "onMessageReceived: SenderID :" + senderID);
 
             if (senderID.length() == 0) {
-                Toast.makeText(this, "Sender ID string needs to be set", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onMessageReceived: Sender ID string needs to be set");
             }
 
             if (senderID.equals(from)) {
@@ -45,6 +45,9 @@ public class MyFcmListenerService extends FirebaseMessagingService {
                         getString(R.string.gcm_weather_alert),
                         weather, location
                 );
+                Log.d(TAG, "onMessageReceived: weather: " + weather);
+                Log.d(TAG, "onMessageReceived: location: " + location);
+                Log.d(TAG, "onMessageReceived: Alert: " + alert);
                 sendNotification(alert);
             }
 
@@ -74,7 +77,7 @@ public class MyFcmListenerService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(NOTIFICATION_ID /* ID of notification */, notificationBuilder.build());
     }
 
 }

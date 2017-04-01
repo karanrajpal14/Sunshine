@@ -568,6 +568,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 //build your notification here.
                 NotificationCompat.Builder builder = new android.support.v4.app.NotificationCompat.Builder(context)
+                        .setColor(resources.getColor(R.color.colorPrimaryLight))
                         .setSmallIcon(iconId)
                         .setContentTitle(title)
                         .setLargeIcon(largeIcon)
