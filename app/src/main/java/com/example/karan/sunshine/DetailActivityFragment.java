@@ -8,8 +8,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -64,16 +65,16 @@ public class DetailActivityFragment extends Fragment implements android.support.
     ShareActionProvider shareActionProvider;
     //Views required to set the data fetched from the loader
     private ImageView iconView;
-    private TextView friendlyDateTextView;
-    private TextView dayTextView;
+    private TextView dateTextView;
     private TextView descTextView;
     private TextView highTextView;
     private TextView lowTextView;
+    private TextView humidityLabelTextView;
     private TextView humidityTextView;
+    private TextView windLabelTextView;
     private TextView windTextView;
+    private TextView pressureLabelTextView;
     private TextView pressureTextView;
-    private ImageView compassImageView;
-    private CompassView windVaneView;
 
     private String forecastStr;
     private Uri dateUri;
@@ -107,33 +108,33 @@ public class DetailActivityFragment extends Fragment implements android.support.
         }
 
         iconView = (ImageView) rootView.findViewById(R.id.detail_icon_imageView);
-        friendlyDateTextView = (TextView) rootView.findViewById(R.id.detail_friendly_date_textView);
+        dateTextView = (TextView) rootView.findViewById(R.id.detail_date_textview);
         descTextView = (TextView) rootView.findViewById(R.id.detail_forecast_textView);
-        dayTextView = (TextView) rootView.findViewById(R.id.detail_day_textView);
         highTextView = (TextView) rootView.findViewById(R.id.detail_high_textView);
         lowTextView = (TextView) rootView.findViewById(R.id.detail_low_textView);
+        humidityLabelTextView = (TextView) rootView.findViewById(R.id.detail_humidity_label_textView);
         humidityTextView = (TextView) rootView.findViewById(R.id.detail_humidity_textView);
+        windLabelTextView = (TextView) rootView.findViewById(R.id.detail_wind_label_textView);
         windTextView = (TextView) rootView.findViewById(R.id.detail_wind_textView);
+        pressureLabelTextView = (TextView) rootView.findViewById(R.id.detail_pressure_label_textView);
         pressureTextView = (TextView) rootView.findViewById(R.id.detail_pressure_textView);
-        compassImageView = (ImageView) rootView.findViewById(R.id.detail_compass_view);
-        windVaneView = (CompassView) rootView.findViewById(R.id.detail_wind_vane_view);
 
         return rootView;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_detail_fragment, menu);
-
-        MenuItem shareItem = menu.findItem(R.id.action_share);
-
-        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
-
-        if (forecastStr != null) {
-            shareActionProvider.setShareIntent(createShareIntent());
-        } else {
-            Log.d(LOG_TAG, "Share action is null");
+        if (getActivity() instanceof DetailActivity) {
+            // Inflate the menu, it adds items to the action bar if present
+            inflater.inflate(R.menu.menu_detail_fragment, menu);
+            finishCreatingMenu(menu);
         }
+    }
+
+    private void finishCreatingMenu(Menu menu) {
+        //Get the share menu item
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        menuItem.setIntent(createShareIntent());
     }
 
     private Intent createShareIntent() {
@@ -184,24 +185,26 @@ public class DetailActivityFragment extends Fragment implements android.support.
         if (data != null && data.moveToFirst()) {
 
             int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
+            String weatherDesc = data.getString(COL_WEATHER_DESC);
+
+            if (Utility.usingLocalGraphics(getActivity())) {
+                iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherConditionId));
+            } else {
+
+                Glide.with(this)
+                        .load(Utility.getArtUrlForWeatherCondition(getActivity(), weatherConditionId))
+                        .error(Utility.getArtResourceForWeatherCondition(weatherConditionId))
+                        .crossFade()
+                        .into(iconView);
+                iconView.setContentDescription(getString(R.string.a11y_forecast_icon, weatherDesc));
+            }
 
             long date = data.getLong(COL_WEATHER_DATE);
-            String dateText = Utility.getFormattedMonthDay(getActivity(), date);
-            String dayString = Utility.getDayName(getContext(), date);
-            dayTextView.setText(dayString);
-            String friendlyDateString = Utility.getFormattedMonthDay(getContext(), date);
-            friendlyDateTextView.setText(friendlyDateString);
+            String friendlyDateString = Utility.getFullFriendlyDayString(getActivity(), date);
+            this.dateTextView.setText(friendlyDateString);
 
-            String weatherDesc = data.getString(COL_WEATHER_DESC);
             descTextView.setText(weatherDesc);
             descTextView.setContentDescription(getString(R.string.a11y_forecast, weatherDesc));
-
-            Glide.with(this)
-                    .load(Utility.getArtUrlForWeatherCondition(getActivity(), weatherConditionId))
-                    .error(Utility.getArtResourceForWeatherCondition(weatherConditionId))
-                    .crossFade()
-                    .into(iconView);
-            iconView.setContentDescription(getString(R.string.a11y_forecast_icon, weatherDesc));
 
             boolean isMetric = Utility.isMetric(getContext());
             String high = Utility.formatTemperature(getContext(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric);
@@ -212,30 +215,53 @@ public class DetailActivityFragment extends Fragment implements android.support.
             lowTextView.setText(low);
             lowTextView.setContentDescription(getString(R.string.a11y_low_temp, low));
 
+            humidityLabelTextView.setText(R.string.humidity_label);
             float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
-            humidityTextView.setText(getActivity().getString(R.string.format_humidity, humidity));
-            humidityTextView.setContentDescription(humidityTextView.getText());
+            humidityTextView.setText(getString(R.string.format_humidity, humidity));
+            humidityTextView.setContentDescription(getString(R.string.a11y_humidity, humidityTextView.getText()));
+            humidityLabelTextView.setContentDescription(humidityTextView.getContentDescription());
 
+            pressureLabelTextView.setText(R.string.pressure_label);
             float pressure = data.getFloat(COL_WEATHER_PRESSURE);
-            pressureTextView.setText(getActivity().getString(R.string.format_pressure, pressure));
-            pressureTextView.setContentDescription(pressureTextView.getText());
+            pressureTextView.setText(getString(R.string.format_pressure, pressure));
+            pressureTextView.setContentDescription(getString(R.string.a11y_pressure, pressureTextView.getText()));
+            pressureLabelTextView.setContentDescription(pressureTextView.getContentDescription());
 
+            windLabelTextView.setText(R.string.wind_label);
             float windSpeed = data.getFloat(COL_WEATHER_WIND_SPEED);
             float windDir = data.getFloat(COL_WEATHER_DEGREES);
             windTextView.setText(Utility.getFormattedWind(getContext(), windSpeed, windDir));
-            windTextView.setContentDescription(windTextView.getText());
+            windTextView.setContentDescription(getString(R.string.a11y_wind, windTextView.getText()));
+            windLabelTextView.setContentDescription(windTextView.getContentDescription());
 
-            //compassImageView.setVisibility(View.VISIBLE);
-            windVaneView.setVisibility(View.VISIBLE);
-            windVaneView.setVaneDirection(windDir, Utility.getFormattedWind(getContext(), windSpeed, windDir));
-            windVaneView.setContentDescription(windTextView.getText());
-
-            forecastStr = String.format("%s - %s - %s/%s", dateText, weatherDesc, high, low);
+            forecastStr = String.format("%s - %s - %s/%s", friendlyDateString, weatherDesc, high, low);
 
             if (shareActionProvider != null) {
                 shareActionProvider.setShareIntent(createShareIntent());
             } else {
                 Log.d(LOG_TAG, "Share action is null");
+            }
+        }
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
+
+        // We need to start the enter transition after the data has loaded
+        if (activity instanceof DetailActivity) {
+            activity.supportStartPostponedEnterTransition();
+
+            if (null != toolbarView) {
+                activity.setSupportActionBar(toolbarView);
+
+                activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+                activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        } else {
+            if (null != toolbarView) {
+                Menu menu = toolbarView.getMenu();
+                if (null != menu) menu.clear();
+                toolbarView.inflateMenu(R.menu.menu_detail_fragment);
+                finishCreatingMenu(toolbarView.getMenu());
             }
         }
     }

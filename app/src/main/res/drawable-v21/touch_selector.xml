@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- State when a row is being pressed, but hasn't yet been activated (finger down) -->
-    <item android:state_pressed="true">
-        <ripple android:color="@color/grey_700" />
-    </item>
+    <item android:drawable="@color/activated" android:state_activated="true" />
 
-    <!-- When the view is "activated".  In SINGLE_CHOICE_MODE, it flags the active row
-         of a ListView -->
-    <item android:drawable="@color/colorPrimaryLight" android:state_activated="true" />
-
-    <!-- Default, "just hangin' out" state. -->
-    <item android:drawable="@android:color/transparent" />
+    <!-- Default, "just hangin' out" state. The base state also
+         implements the ripple effect. -->
+    <item android:drawable="@drawable/touch_selector_base" />
 </selector>

@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:state_pressed="true">
-        <ripple android:color="@color/grey_700" />
+        <ripple android:color="@color/grey" />
     </item>
 
     <item android:drawable="@color/colorPrimaryLight" android:state_activated="true" />
