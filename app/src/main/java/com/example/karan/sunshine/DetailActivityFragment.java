@@ -9,15 +9,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -100,7 +101,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_detail_start, container, false);
 
         Bundle dateUriBundle = getArguments();
         if (dateUriBundle != null) {
@@ -108,7 +109,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
         }
 
         iconView = (ImageView) rootView.findViewById(R.id.detail_icon_imageView);
-        dateTextView = (TextView) rootView.findViewById(R.id.detail_date_textview);
+        dateTextView = (TextView) rootView.findViewById(R.id.detail_date_textView);
         descTextView = (TextView) rootView.findViewById(R.id.detail_forecast_textView);
         highTextView = (TextView) rootView.findViewById(R.id.detail_high_textView);
         lowTextView = (TextView) rootView.findViewById(R.id.detail_low_textView);
@@ -157,6 +158,10 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
             getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
         }
+        ViewParent vp = getView().getParent();
+        if (vp instanceof CardView) {
+            ((View) vp).setVisibility(View.INVISIBLE);
+        }
     }
 
     public void onUnitChanged() {
@@ -183,7 +188,10 @@ public class DetailActivityFragment extends Fragment implements android.support.
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
-
+            ViewParent vp = getView().getParent();
+            if (vp instanceof CardView) {
+                ((View) vp).setVisibility(View.VISIBLE);
+            }
             int weatherConditionId = data.getInt(COL_WEATHER_CONDITION_ID);
             String weatherDesc = data.getString(COL_WEATHER_DESC);
 
@@ -235,12 +243,6 @@ public class DetailActivityFragment extends Fragment implements android.support.
             windLabelTextView.setContentDescription(windTextView.getContentDescription());
 
             forecastStr = String.format("%s - %s - %s/%s", friendlyDateString, weatherDesc, high, low);
-
-            if (shareActionProvider != null) {
-                shareActionProvider.setShareIntent(createShareIntent());
-            } else {
-                Log.d(LOG_TAG, "Share action is null");
-            }
         }
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
