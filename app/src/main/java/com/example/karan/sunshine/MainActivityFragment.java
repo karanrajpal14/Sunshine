@@ -1,10 +1,12 @@
 package com.example.karan.sunshine;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
@@ -135,6 +137,25 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         }, emptyView, choiceMode);
         recyclerView.setAdapter(forecastAdapter);
         forecastAdapter.setUseTodayLayout(useTodayLayout);
+
+        final View parallaxView = view.findViewById(R.id.parallax_bar);
+        if (null != parallaxView) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        int max = parallaxView.getHeight();
+                        if (dy > 0) {
+                            parallaxView.setTranslationY(Math.max(-max, parallaxView.getTranslationY() - dy / 2));
+                        } else {
+                            parallaxView.setTranslationY(Math.min(0, parallaxView.getTranslationY() - dy / 2));
+                        }
+                    }
+                });
+            }
+        }
 
         //Check if there is a savedInstance state.
         //If present, get it and retrieve the position using the SELECTED_POSITION_KEY
@@ -291,5 +312,13 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         Log.d(TAG, "onSaveInstanceState: Position saved");
         forecastAdapter.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (recyclerView != null) {
+            recyclerView.clearOnScrollListeners();
+        }
     }
 }
