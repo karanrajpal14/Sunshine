@@ -210,8 +210,17 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // Will contain the raw JSON response as a string.
         String forecastJSON = null;
-        Uri.Builder builder = new Uri.Builder();
+
+        // We no longer need just the location String, but also potentially the latitude and
+        // longitude, in case we are syncing based on a new Place Picker API result.
+        Context context = getContext();
+        String locationLatitude = String.valueOf(Utility.getLocationLatitude(context));
+        String locationLongitude = String.valueOf(Utility.getLocationLongitude(context));
+
+        Uri.Builder baseUrlBuilder = new Uri.Builder();
         final String QUERY_PARAM = "q";
+        final String LAT_PARAM = "lat";
+        final String LON_PARAM = "lon";
         final String MODE_PARAM = "mode";
         final String UNITS_PARAM = "units";
         final String DAYCOUNT_PARAM = "cnt";
@@ -222,12 +231,27 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         // Construct the URL for the OpenWeatherMap query
         // Possible parameters are avaiable at OWM's forecast API page, at
         // http://openweathermap.org/API#forecast
-        builder.scheme("http")
+        baseUrlBuilder.scheme("http")
                 .authority("api.openweathermap.org")
                 .appendPath("data")
                 .appendPath("2.5")
                 .appendPath("forecast")
-                .appendPath("daily")
+                .appendPath("daily");
+
+        // Instead of always building the query based off of the location string, we want to
+        // potentially build a query using a lat/lon value. This will be the case when we are
+        // syncing based off of a new location from the Place Picker API. So we need to check
+        // if we have a lat/lon to work with, and use those when we do. Otherwise, the weather
+        // service may not understand the location address provided by the Place Picker API
+        // and the user could end up with no weather! The horror!
+        if (Utility.isLocationLatLonAvailable(context)) {
+            baseUrlBuilder.appendQueryParameter(LAT_PARAM, locationLatitude)
+                    .appendQueryParameter(LON_PARAM, locationLongitude);
+        } else {
+            baseUrlBuilder.appendQueryParameter(QUERY_PARAM, locationQuery);
+        }
+
+        baseUrlBuilder
                 .appendQueryParameter(QUERY_PARAM, locationQuery)
                 .appendQueryParameter(MODE_PARAM, format)
                 .appendQueryParameter(UNITS_PARAM, units)
@@ -236,8 +260,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 .build();
 
         try {
-
-            URL url = new URL(builder.toString());
+            Log.d(TAG, "onPerformSync: Built URL: " + baseUrlBuilder.toString());
+            URL url = new URL(baseUrlBuilder.toString());
             // Create the request to OpenWeatherMap, and open the connection
             urlConn = (HttpURLConnection) url.openConnection();
             urlConn.setRequestMethod("GET");

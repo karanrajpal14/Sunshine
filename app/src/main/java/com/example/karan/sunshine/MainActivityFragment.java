@@ -44,9 +44,9 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     static final int COL_WEATHER_CONDITION_ID = 6;
     static final int COL_COORD_LAT = 7;
     static final int COL_COORD_LONG = 8;
-    private static final String TAG = MainActivityFragment.class.getSimpleName();
     //Assigning an id to the loader
     private static final int LOADER_ID = 0;
+    private static final String TAG = MainActivityFragment.class.getSimpleName();
     private static final String SELECTED_POSITION_KEY = "selected_key";
     private static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -65,6 +65,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             WeatherContract.LocationEntry.COLUMN_COORD_LAT,
             WeatherContract.LocationEntry.COLUMN_COORD_LONG
     };
+
     public ForecastAdapter forecastAdapter;
     private RecyclerView recyclerView;
     private int lastSelectedIndex = RecyclerView.NO_POSITION;
@@ -269,6 +270,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             Log.d(TAG, "onLoadFinished: Scrolling to position: " + lastSelectedIndex);
             recyclerView.smoothScrollToPosition(lastSelectedIndex);
         }
+
         updateEmptyView();
         saveSetLocationToPreferences();
 
@@ -339,6 +341,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         if (lastSelectedIndex != RecyclerView.NO_POSITION) {
             outState.putInt(SELECTED_POSITION_KEY, lastSelectedIndex);
         }
+
         Log.d(TAG, "onSaveInstanceState: Position saved");
         forecastAdapter.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
