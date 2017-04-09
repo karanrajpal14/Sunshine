@@ -22,4 +22,8 @@
     <style name="SettingsTheme" parent="AppTheme">
     </style>
 
+    <style name="AppTheme.Main" parent="@style/AppTheme" />
+
+    <style name="AppTheme.Details" parent="@style/AppTheme" />
+
 </resources>

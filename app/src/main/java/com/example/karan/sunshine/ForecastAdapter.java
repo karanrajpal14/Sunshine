@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,6 +86,10 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastViewH
                     .crossFade()
                     .into(holder.iconView);
         }
+
+        // this enables better animations. even if we lose state due to a device rotation,
+        // the animator can use this to re-find the original view
+        ViewCompat.setTransitionName(holder.iconView, "iconView" + position);
 
         holder.dateTextView.setText(
                 Utility.getFriendlyDayString(

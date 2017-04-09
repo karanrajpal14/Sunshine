@@ -10,7 +10,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +30,8 @@ import com.example.karan.sunshine.data.WeatherContract;
 public class DetailActivityFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
 
     static final String DETAIL_URI = "URI";
+    static final String DETAIL_TRANSITION_ANIMATION = "DTA";
+
     // These indices are tied to DETAIL_COLUMNS. If DETAIL_COLUMNS changes, these
     // must change.
     static final int COL_WEATHER_ID = 0;
@@ -63,7 +64,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
             WeatherContract.WeatherEntry.COLUMN_DEGREES,
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
-    ShareActionProvider shareActionProvider;
+
     //Views required to set the data fetched from the loader
     private ImageView iconView;
     private TextView dateTextView;
@@ -79,6 +80,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
 
     private String forecastStr;
     private Uri dateUri;
+    private boolean sharedDetailTransition;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -106,6 +108,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
         Bundle dateUriBundle = getArguments();
         if (dateUriBundle != null) {
             dateUri = dateUriBundle.getParcelable(DetailActivityFragment.DETAIL_URI);
+            sharedDetailTransition = dateUriBundle.getBoolean(DetailActivityFragment.DETAIL_TRANSITION_ANIMATION, false);
         }
 
         iconView = (ImageView) rootView.findViewById(R.id.detail_icon_imageView);
@@ -249,7 +252,7 @@ public class DetailActivityFragment extends Fragment implements android.support.
         Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 
         // We need to start the enter transition after the data has loaded
-        if (activity instanceof DetailActivity) {
+        if (sharedDetailTransition) {
             activity.supportStartPostponedEnterTransition();
 
             if (null != toolbarView) {

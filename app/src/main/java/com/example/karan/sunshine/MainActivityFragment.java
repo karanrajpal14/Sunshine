@@ -68,6 +68,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     private int lastSelectedIndex = RecyclerView.NO_POSITION;
     private boolean useTodayLayout, autoSelectView;
     private int choiceMode;
+    private boolean holdForTransition;
 
     public MainActivityFragment() {
     }
@@ -75,6 +76,12 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(LOADER_ID, savedInstanceState, this);
+        // We hold for transition here just in-case the activity
+        // needs to be re-created. In a standard return transition,
+        // this doesn't actually make a difference.
+        if (holdForTransition) {
+            getActivity().supportPostponeEnterTransition();
+        }
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -109,6 +116,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
                 0, 0);
         choiceMode = a.getInt(R.styleable.MainActivityFragment_android_choiceMode, AbsListView.CHOICE_MODE_NONE);
         autoSelectView = a.getBoolean(R.styleable.MainActivityFragment_autoSelectView, false);
+        a.getBoolean(R.styleable.MainActivityFragment_sharedElementTransitions, false);
         a.recycle();
     }
 
@@ -130,7 +138,8 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
             public void onClick(Long date, ForecastAdapter.ForecastViewHolder viewHolder) {
                 String locationSetting = Utility.getPreferredLocation(getActivity());
                 ((Callback) getActivity()).onItemSelected(
-                        WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, date)
+                        WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, date),
+                        viewHolder
                 );
                 lastSelectedIndex = viewHolder.getAdapterPosition();
             }
@@ -197,10 +206,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         }
     }
 
-    /*public void updateWeather() {
-        SunshineSyncAdapter.syncImmediately(getActivity());
-    }*/
-
     public void onLocationChanged() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
@@ -248,6 +253,8 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         saveSetLocationToPreferences();
 
         if (data.getCount() > 0) {
+            getActivity().supportStartPostponedEnterTransition();
+        } else {
             recyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
@@ -260,6 +267,9 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
                         RecyclerView.ViewHolder vh = recyclerView.findViewHolderForAdapterPosition(itemPosition);
                         if (null != vh && autoSelectView) {
                             forecastAdapter.selectView(vh);
+                        }
+                        if (holdForTransition) {
+                            getActivity().supportStartPostponedEnterTransition();
                         }
                         return true;
                     }

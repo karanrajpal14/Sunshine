@@ -11,5 +11,5 @@ public interface Callback {
     /**
      * DetailFragmentCallback for when an item has been selected.
      */
-    void onItemSelected(Uri dateUri);
+    void onItemSelected(Uri dateUri, ForecastAdapter.ForecastViewHolder viewHolder);
 }

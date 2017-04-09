@@ -5,20 +5,19 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.karan.sunshine.sync.SunshineSyncAdapter;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity implements Callback {
 
-    public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     //Tag for the detail fragment
     private final String DETAILFRAGMENT_TAG = "DFTAG";
     //Store current location and unit to verify change
@@ -71,17 +70,6 @@ public class MainActivity extends AppCompatActivity implements Callback {
 
         SunshineSyncAdapter.initializeSyncAdapter(this);
 
-        if (checkPlayServices()) {
-            /*// Because this is the initial creation of the app, we'll want to be certain we have
-            // a token. If we do not, then we will start the IntentService that will register this
-            // application with GCM.
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean sentToken = sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false);
-            if (!sentToken) {
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-            }*/
-        }
     }
 
     @Override
@@ -171,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
     }
 
     @Override
-    public void onItemSelected(Uri dateUri) {
+    public void onItemSelected(Uri dateUri, ForecastAdapter.ForecastViewHolder viewHolder) {
 
         //Replace the fragment in the container
         if (twoPane) {
@@ -193,28 +181,15 @@ public class MainActivity extends AppCompatActivity implements Callback {
         else {
             Intent intent = new Intent(this, DetailActivity.class);
             intent.setData(dateUri);
-            startActivity(intent);
+
+            ActivityOptionsCompat activityOptions =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            this,
+                            new Pair<View, String>(viewHolder.iconView, getString(R.string.detail_icon_transition_name)
+                            )
+                    );
+            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         }
     }
 
-    /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
-     */
-    private boolean checkPlayServices() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this, resultCode,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i("MainActivity", "This device is not supported.");
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
 }
