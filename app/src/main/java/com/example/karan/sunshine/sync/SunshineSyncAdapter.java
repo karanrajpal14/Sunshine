@@ -64,7 +64,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     // 60 seconds (1 minute)  * 180 = 3 hours
     public static final int SYNC_INTERVAL = 5 * 180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
-
+    public static final String ACTION_DATA_UPDATED =
+            "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
     //Projection used to fetch the data required by the notification
     private static final String[] NOTIFY_WEATHER_PROJECTION = new String[]{
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
@@ -72,13 +73,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
             WeatherContract.WeatherEntry.COLUMN_SHORT_DESC
     };
-
     // these indices must match the projection
     private static final int INDEX_WEATHER_ID = 0;
     private static final int INDEX_MAX_TEMP = 1;
     private static final int INDEX_MIN_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
-
     //Constants required by the notification
     private static final long DAY_IN_MILLIS = TimeUnit.DAYS.toMillis(1);
     private static final int WEATHER_NOTIFICATION_ID = 3004;
@@ -475,7 +474,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                             Long.toString(dayTime.setJulianDay(julianStartDay - 1))
                     }
             );
-
+            updateWidgets();
             notifyWeather();
 
             Log.d(TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
@@ -485,6 +484,14 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
             setLocationStatus(getContext(), LOCATION_STATUS_SERVER_INVALID);
         }
+    }
+
+    private void updateWidgets() {
+        Context context = getContext();
+        // Setting the package ensures that only components in our app will receive the broadcast
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
+                .setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
     }
 
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
