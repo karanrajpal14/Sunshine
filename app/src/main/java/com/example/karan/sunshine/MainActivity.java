@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.karan.sunshine.data.WeatherContract;
 import com.example.karan.sunshine.sync.SunshineSyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements Callback {
@@ -35,16 +36,19 @@ public class MainActivity extends AppCompatActivity implements Callback {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        Uri contentUri = getIntent() != null ? getIntent().getData() : null;
+
         if (findViewById(R.id.weather_detail_container) != null) {
             //Device has a wide screen
             twoPane = true;
             if (savedInstanceState == null) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.weather_detail_container,
-                                new DetailActivityFragment(),
-                                DETAILFRAGMENT_TAG
-                        ).commit();
+                DetailActivityFragment fragment = new DetailActivityFragment();
+                if (contentUri != null) {
+                    Bundle args = new Bundle();
+                    args.putParcelable(DetailActivityFragment.DETAIL_URI, contentUri);
+                    fragment.setArguments(args);
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG).commit();
             }
 
         } else {
@@ -56,6 +60,11 @@ public class MainActivity extends AppCompatActivity implements Callback {
 
         MainActivityFragment mainActivityFragment = (MainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
         mainActivityFragment.setUseTodayLayout(!twoPane);
+
+        if (contentUri != null) {
+            mainActivityFragment.setInitialSelectedDate(
+                    WeatherContract.WeatherEntry.getDateFromUri(contentUri));
+        }
 
         //Get the currently set values for Location and Units from SharedPreferences
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);

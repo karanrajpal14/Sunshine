@@ -67,13 +67,16 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastViewH
         cursor.moveToPosition(position);
         int weatherConditionID = cursor.getInt(MainActivityFragment.COL_WEATHER_CONDITION_ID);
         int defaultImage;
+        boolean useLongToday;
 
         switch (getItemViewType(position)) {
             case VIEW_TYPE_TODAY:
                 defaultImage = Utility.getArtResourceForWeatherCondition(weatherConditionID);
+                useLongToday = true;
                 break;
             default:
                 defaultImage = Utility.getIconResourceForWeatherCondition(weatherConditionID);
+                useLongToday = false;
         }
 
         if (Utility.usingLocalGraphics(context)) {
@@ -94,7 +97,8 @@ class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastViewH
         holder.dateTextView.setText(
                 Utility.getFriendlyDayString(
                         context,
-                        cursor.getLong(MainActivityFragment.COL_WEATHER_DATE)
+                        cursor.getLong(MainActivityFragment.COL_WEATHER_DATE),
+                        useLongToday
                 )
         );
 

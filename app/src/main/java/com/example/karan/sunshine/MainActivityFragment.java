@@ -72,6 +72,7 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     private boolean useTodayLayout, autoSelectView;
     private int choiceMode;
     private boolean holdForTransition;
+    private long initialSelectedDate = -1;
 
     public MainActivityFragment() {
     }
@@ -144,7 +145,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
                         WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationSetting, date),
                         viewHolder
                 );
-                lastSelectedIndex = viewHolder.getAdapterPosition();
             }
         }, emptyView, choiceMode);
         recyclerView.setAdapter(forecastAdapter);
@@ -190,11 +190,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
         //Check if there is a savedInstance state.
         //If present, get it and retrieve the position using the SELECTED_POSITION_KEY
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(SELECTED_POSITION_KEY)) {
-                // The Recycler View probably hasn't even been populated yet.  Actually perform the
-                // swapout in onLoadFinished.
-                lastSelectedIndex = savedInstanceState.getInt(SELECTED_POSITION_KEY);
-            }
             forecastAdapter.onRestoreInstanceState(savedInstanceState);
         }
         forecastAdapter.setUseTodayLayout(useTodayLayout);
@@ -265,12 +260,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         forecastAdapter.swapCursor(data);
-
-        if (lastSelectedIndex != RecyclerView.NO_POSITION) {
-            Log.d(TAG, "onLoadFinished: Scrolling to position: " + lastSelectedIndex);
-            recyclerView.smoothScrollToPosition(lastSelectedIndex);
-        }
-
         updateEmptyView();
         saveSetLocationToPreferences();
 
@@ -284,9 +273,24 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
                     // we see Children.
                     if (recyclerView.getChildCount() > 0) {
                         recyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                        int itemPosition = forecastAdapter.getSelectedItemPosition();
-                        if (RecyclerView.NO_POSITION == itemPosition) itemPosition = 0;
-                        RecyclerView.ViewHolder vh = recyclerView.findViewHolderForAdapterPosition(itemPosition);
+                        int position = forecastAdapter.getSelectedItemPosition();
+                        if (RecyclerView.NO_POSITION == position && -1 != initialSelectedDate) {
+                            Cursor data = forecastAdapter.getCursor();
+                            int count = data.getCount();
+                            int dateColumn = data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE);
+                            for (int i = 0; i < count; i++) {
+                                data.moveToPosition(i);
+                                if (data.getLong(dateColumn) == initialSelectedDate) {
+                                    position = i;
+                                    break;
+                                }
+                            }
+                        }
+                        if (position == RecyclerView.NO_POSITION) position = 0;
+                        // If we don't need to restart the loader, and there's a desired position to restore
+                        // to, do so now.
+                        recyclerView.smoothScrollToPosition(position);
+                        RecyclerView.ViewHolder vh = recyclerView.findViewHolderForAdapterPosition(position);
                         if (null != vh && autoSelectView) {
                             forecastAdapter.selectView(vh);
                         }
@@ -299,6 +303,10 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
                 }
             });
         }
+    }
+
+    public void setInitialSelectedDate(long initialSelectedDate) {
+        this.initialSelectedDate = initialSelectedDate;
     }
 
     @Override
@@ -337,10 +345,6 @@ public class MainActivityFragment extends android.support.v4.app.Fragment implem
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-
-        if (lastSelectedIndex != RecyclerView.NO_POSITION) {
-            outState.putInt(SELECTED_POSITION_KEY, lastSelectedIndex);
-        }
 
         Log.d(TAG, "onSaveInstanceState: Position saved");
         forecastAdapter.onSaveInstanceState(outState);
